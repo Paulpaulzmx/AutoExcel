@@ -19,12 +19,6 @@ public class AutoExcelController {
     @Resource
     private StuMsgService stuMsgService;
 
-//    @GetMapping("/hello")
-//    public String sayHello(@RequestParam(name = "name") String name, Model model) {
-//        model.addAttribute("name", name);
-//        return "hello";
-//    }
-
     @PostMapping("/submit")
     @ResponseBody
 //    public Result submit(HttpServletRequest httpServletRequest) {     //测试Http请求用
