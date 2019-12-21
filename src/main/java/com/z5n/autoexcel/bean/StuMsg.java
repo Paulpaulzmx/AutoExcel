@@ -8,15 +8,21 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name="stu_msg")
+@Table(name = "stu_msg")
 public class StuMsg implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;             //主键
+
     private String stuId;
+
     private String stuClass;
+
     private String stuName;
+
     private String stuTel;
+
     private String stuChoice;
 
     private String note;
