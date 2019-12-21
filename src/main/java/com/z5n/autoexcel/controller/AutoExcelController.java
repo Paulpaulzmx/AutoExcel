@@ -21,7 +21,6 @@ public class AutoExcelController {
 
     @PostMapping("/submit")
     @ResponseBody
-//    public Result submit(HttpServletRequest httpServletRequest) {     //测试Http请求用
     public Result submit(StuMsg stuMsg){
         System.out.println(stuMsg);
 //存入数据库、excel设置为定时任务（每隔一段时间将新的请求写入excel表中，数量达标后自动生成excel）
