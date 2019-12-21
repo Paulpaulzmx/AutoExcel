@@ -20,7 +20,7 @@ public class StuMsg implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;             //主键
+    private int id;
 
     private String stuId;
 
