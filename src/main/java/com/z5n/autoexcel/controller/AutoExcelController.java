@@ -1,14 +1,11 @@
 package com.z5n.autoexcel.controller;
 
-import com.z5n.autoexcel.bean.Result;
-import com.z5n.autoexcel.bean.StuMsg;
+import com.z5n.autoexcel.model.Result;
+import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.service.StuMsgService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;

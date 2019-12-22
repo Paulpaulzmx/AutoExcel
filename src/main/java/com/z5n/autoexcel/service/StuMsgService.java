@@ -1,11 +1,10 @@
 package com.z5n.autoexcel.service;
 
-import com.z5n.autoexcel.bean.StuMsg;
+import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.repository.StuMsgRepository;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import javax.persistence.Table;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
