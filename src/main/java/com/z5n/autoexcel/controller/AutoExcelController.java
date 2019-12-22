@@ -1,16 +1,19 @@
 package com.z5n.autoexcel.controller;
 
+import com.alibaba.excel.EasyExcel;
+import com.alibaba.excel.support.ExcelTypeEnum;
+import com.z5n.autoexcel.excel.TemplateDataListener;
 import com.z5n.autoexcel.model.Result;
 import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.service.StuMsgService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
-@Controller
+@RestController
 public class AutoExcelController {
 
     private final StuMsgService stuMsgService;
@@ -20,7 +23,6 @@ public class AutoExcelController {
     }
 
     @PostMapping("/submit")
-    @ResponseBody
     public Result submit(StuMsg stuMsg) {
         //todo 使用参数实体配合spring校验
         System.out.println(stuMsg);
@@ -28,17 +30,38 @@ public class AutoExcelController {
         //提交记录存入数据库
         stuMsgService.create(stuMsg);
 
-        Result result = new Result();
-        result.setResultCode(200);
-        result.setStatus("ok");
-        return result;
+        return Result.success(stuMsg);
     }
 
-    /**
-     * 请求主页
-     */
-    @GetMapping("/")
-    public String index() {
-        return "register";
+    @PostMapping("uploadTemplate")
+    public Result uploadTemplate(@RequestParam("file") MultipartFile file) {
+        if (file.isEmpty()) {
+            return Result.error("文件为空");
+        }
+
+        String origName = file.getOriginalFilename();
+        if (origName == null) {
+            return Result.error();
+        }
+        // 判断文件类型
+        String type = origName.contains(".") ? origName.substring(origName.lastIndexOf(".") + 1) : null;
+
+        if (type == null) {
+            return Result.error();
+        }
+
+        type = type.toLowerCase().trim();
+        if (!ExcelTypeEnum.XLSX.getValue().equals(type) && !ExcelTypeEnum.XLS.getValue().equals(type)) {
+            return Result.error();
+        }
+
+        try {
+            EasyExcel.read(file.getInputStream(), new TemplateDataListener()).sheet().doRead();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return Result.success();
     }
+
 }
