@@ -21,19 +21,8 @@ import java.util.Map;
 
 @Slf4j
 public class TemplateDataListener extends AnalysisEventListener<Map<Integer, String>> {
-    /**
-     * 每隔5条存储数据库，实际使用中可以3000条，然后清理list ，方便内存回收
-     */
-    private static final int BATCH_COUNT = 5;
-    List<Map<Integer, String>> list = new ArrayList<Map<Integer, String>>();
 
-
-
-    /**
-     * 加上存储数据库
-     */
-    private void saveData() {
-    }
+    private final List<Map<Integer, String>> headList = new ArrayList<>();
 
     @Override
     public void invoke(Map<Integer, String> integerStringMap, AnalysisContext analysisContext) {
@@ -47,6 +36,11 @@ public class TemplateDataListener extends AnalysisEventListener<Map<Integer, Str
 
     @Override
     public void invokeHeadMap(Map<Integer, String> headMap, AnalysisContext context) {
+        headList.add(headMap);
         log.info("读取到表头数据 : {}", JSON.toJSONString(headMap));
+    }
+
+    public List<Map<Integer, String>> getHeadList() {
+        return headList;
     }
 }
