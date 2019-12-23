@@ -2,6 +2,7 @@ package com.z5n.autoexcel.service.impl;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.support.ExcelTypeEnum;
+import com.alibaba.fastjson.JSON;
 import com.z5n.autoexcel.excel.TemplateDataListener;
 import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.entity.Template;
@@ -72,10 +73,9 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
         if (CollectionUtils.isEmpty(map)) {
             throw new BusinessException("读取表头数据为空");
         }
-        String join = String.join(",", map.values());
 
         Template template = new Template();
-        template.setHeadContent(join);
+        template.setHeadContent(JSON.toJSONString(map));
         template.setStuInfoId(stuInfoId);
         return templateRepository.save(template);
     }
