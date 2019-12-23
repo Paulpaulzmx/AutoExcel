@@ -7,8 +7,7 @@ import com.z5n.autoexcel.model.entity.Template;
 import com.z5n.autoexcel.service.StuMsgService;
 import com.z5n.autoexcel.service.TemplateService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -44,6 +43,17 @@ public class AutoExcelController {
         Template template = templateService.readExcelHeadTemplate(file, stuInfoId);
 
         return ResultBody.success(template);
+    }
+
+    @RequestMapping(value = "/template/{id}", method = RequestMethod.GET)
+    public ResultBody getTemplateById(@PathVariable("id") Integer id) {
+        if (id == null) {
+            throw new BusinessException("参数不能为空");
+        }
+
+        Template template = templateService.getById(id);
+        return ResultBody.success(template);
+
     }
 
 }
