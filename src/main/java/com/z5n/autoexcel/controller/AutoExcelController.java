@@ -56,4 +56,10 @@ public class AutoExcelController {
 
     }
 
+
+    @GetMapping("/getExcel")
+    public String getExcel(){
+
+        return "..";
+    }
 }

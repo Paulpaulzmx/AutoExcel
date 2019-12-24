@@ -46,7 +46,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
             throw new BusinessException("文件原名称为空");
         }
         // 判断文件类型
-        String type = origName.contains(".") ? origName.substring(origName.lastIndexOf(".") + 1) : null;
+        String type = origName.contains(".") ? origName.substring(origName.lastIndexOf(".")) : null;
 
         if (StringUtils.isEmpty(type)) {
             throw new BusinessException("文件类型为空");
