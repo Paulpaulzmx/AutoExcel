@@ -59,7 +59,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
 
         TemplateDataListener dataListener = new TemplateDataListener();
         try {
-            EasyExcel.read(file.getInputStream(), dataListener).sheet().doRead();
+            EasyExcel.read(file.getInputStream(), dataListener).headRowNumber(2).sheet().doRead();
         } catch (IOException e) {
             log.error("TemplateServiceImpl_readExcelHeadTemplate_excel读取异常 : ", e);
         }
@@ -69,7 +69,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
             throw new BusinessException("读取数据为空");
         }
 
-        Map<Integer, String> map = headList.get(0);
+        Map<Integer, String> map = headList.get(1);
         if (CollectionUtils.isEmpty(map)) {
             throw new BusinessException("读取表头数据为空");
         }
