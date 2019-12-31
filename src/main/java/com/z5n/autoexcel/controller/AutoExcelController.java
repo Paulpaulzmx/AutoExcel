@@ -1,5 +1,6 @@
 package com.z5n.autoexcel.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.ResultBody;
 import com.z5n.autoexcel.model.entity.StuMsg;
@@ -7,7 +8,12 @@ import com.z5n.autoexcel.model.entity.Template;
 import com.z5n.autoexcel.service.StuMsgService;
 import com.z5n.autoexcel.service.TemplateService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -52,14 +58,14 @@ public class AutoExcelController {
         }
 
         Template template = templateService.getById(id);
-        return ResultBody.success(template);
+        // 返回所有的表头
+        return ResultBody.success(template.getHeadContent());
 
     }
 
 
     @GetMapping("/getExcel")
-    public String getExcel(){
-
-        return "..";
+    public void getExcel() {
+        // 导出整合好数据的excel
     }
 }

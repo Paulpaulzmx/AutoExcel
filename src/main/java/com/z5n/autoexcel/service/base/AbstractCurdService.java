@@ -1,5 +1,6 @@
 package com.z5n.autoexcel.service.base;
 
+import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.repository.BaseRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
@@ -85,8 +86,8 @@ public abstract class AbstractCurdService<ENTITY, ID> implements CurdService<ENT
     public ENTITY getById(ID id) {
 
         //todo 全局异常捕获
-//        return fetchById(id).orElseThrow(() -> new Exception(entityName + "没有找到"));
-        return null;
+        return fetchById(id).orElseThrow(() -> new BusinessException(entityName + "没有找到"));
+//        return null;
     }
 
     /**

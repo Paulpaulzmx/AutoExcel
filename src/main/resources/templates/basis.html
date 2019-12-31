@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/css/register.css" rel="stylesheet">
+
+    <title>xx信息统计</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1;
+        }
+    </style>
+
+
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="nav" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">xx信息统计</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- 中间的主体部分 -->
+<div class="content">
+    <!--    这里写页面内容   -->
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+            <!-- 注册方式分类 nav-pills -->
+            <ul class="nav nav-pills nav-justified">
+                <li class="active"><a href="#form" data-toggle="pill">信息填写</a></li>
+            </ul>
+
+            <div class="tab-content ">
+                <form id="form" class="tab-pane fade in active">
+                    <br/>
+                    <div id="FormBegin">
+                    </div>
+                    <input type="button" onclick="sss()" class="btn btn-lg btn-success"
+                           value="提交">
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 底部footer -->
+<div style="
+    min-width: 100%;
+    background-color: #f8f8f8;
+    padding: 15px;">
+    <footer class="text-center text-muted"
+            style="margin-top: auto;margin-bottom: auto">
+        统计信息
+    </footer>
+</div>
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/js/bootstrap.min.js" type="application/javascript"></script>
+<script>
+    function sss() {
+        // $("#form").ad           d
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/submit",
+            data: $("#form").serialize(),
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+                if (result.code === 200) {
+                    alert("提交成功");
+                } else {
+                    alert("提交异常");
+                }
+            },
+            error: function () {
+                alert("提交失败！");
+            }
+        });
+
+    }
+</script>
+<script>
+    // 获取url中的templateId
+    function getTemplateId() {
+        var url = window.location.href;
+        var templateId = parseInt(url[url.length - 1]);
+        if (!isNaN(templateId)) {
+            return (templateId);
+        }
+    }
+
+    $(document).ready(function () {
+        templateId = getTemplateId();
+        $.ajax({
+            url: "/template/" + templateId,
+            success(result) {
+                if (result.code == "200") {
+                    // 请求模板成功，生成前端表单页面
+                    var result = result.result;
+                    if (result != null) {
+                        var json = (new Function("return " + result))();
+                        for(var item in json){
+                            $("#FormBegin")
+                                .append("<div class=\"form-group\">\n" +
+                                    "        <label>"+json[item]+"</label>\n" +
+                                    "        <input type=\"text\" name="+item+" placeholder=\""+json[item]+"\">\n" +
+                                    "    </div>\n")
+                        }
+                    }
+                } else {
+                    alert("请求模板失败");
+                }
+            },
+            error() {
+                alert("请求失败！");
+            },
+        })
+    })
+</script>
+
+</body>
+</html>
