@@ -29,18 +29,15 @@ public class AutoExcelController {
         this.templateService = templateService;
     }
 
-    @PostMapping("/submit")
-    public ResultBody submit(StuMsg stuMsg) {
-        //todo 使用参数实体配合spring校验
-        System.out.println(stuMsg);
-        //存入数据库、excel设置为定时任务（每隔一段时间将新的请求写入excel表中，数量达标后自动生成excel）
-        //提交记录存入数据库
-        stuMsgService.create(stuMsg);
-
+    @RequestMapping(value = "/submit", method = RequestMethod.POST)
+    public ResultBody submit(@RequestBody String submitMsg) {
+        JSONObject jsonObject = JSONObject.parseObject(submitMsg);
+        StuMsg stuMsg = stuMsgService.submitMsg(jsonObject);
         return ResultBody.success(stuMsg);
     }
 
-    @PostMapping("uploadTemplate")
+
+    @RequestMapping(value = "uploadTemplate", method = RequestMethod.POST)
     public ResultBody uploadTemplate(MultipartFile file, Integer stuInfoId) {
         if (file.isEmpty() || stuInfoId == null) {
             throw new BusinessException("参数不能为空");
@@ -64,7 +61,7 @@ public class AutoExcelController {
     }
 
 
-    @GetMapping("/getExcel")
+    @RequestMapping(value = "/getExcel", method = RequestMethod.GET)
     public void getExcel() {
         // 导出整合好数据的excel
     }
