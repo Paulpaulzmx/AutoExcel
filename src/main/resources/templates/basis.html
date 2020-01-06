@@ -55,6 +55,9 @@
                 <form id="form" class="tab-pane fade in active">
                     <br/>
                     <div id="FormBegin">
+                        <div class="form-group">
+                            <input type="hidden" id="hiddenId" name="templateId" value="">
+                        </div>
                     </div>
                     <input type="button" onclick="sss()" class="btn btn-lg btn-success"
                            value="提交">
@@ -83,16 +86,24 @@
 <script src="/js/jquery-3.4.1.min.js"></script>
 <script src="/js/bootstrap.min.js" type="application/javascript"></script>
 <script>
+
     function sss() {
-        // $("#form").ad           d
+        var LoginData = $("#form").serializeArray();
+        var LoginPram = {};
+
+        for(var i =0;i<LoginData.length;i++)
+        {
+            LoginPram[LoginData[i].name] = LoginData[i]['value'];
+        }
         $.ajax({
             type: "POST",
             dataType: "json",
             url: "/submit",
-            data: $("#form").serialize(),
+            contentType:"application/json;charset=UTF-8",
+            data: JSON.stringify(LoginPram),
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
-                if (result.code === 200) {
+                if (result.code == 200) {
                     alert("提交成功");
                 } else {
                     alert("提交异常");
@@ -109,8 +120,9 @@
     // 获取url中的templateId
     function getTemplateId() {
         var url = window.location.href;
-        var templateId = parseInt(url[url.length - 1]);
+        var templateId = parseInt(url.substring(url.lastIndexOf("/") + 1));
         if (!isNaN(templateId)) {
+            $("#hiddenId").val(templateId);
             return (templateId);
         }
     }
@@ -125,11 +137,11 @@
                     var result = result.result;
                     if (result != null) {
                         var json = (new Function("return " + result))();
-                        for(var item in json){
+                        for (var item in json) {
                             $("#FormBegin")
                                 .append("<div class=\"form-group\">\n" +
-                                    "        <label>"+json[item]+"</label>\n" +
-                                    "        <input type=\"text\" name="+item+" placeholder=\""+json[item]+"\">\n" +
+                                    "        <label>" + json[item] + "</label>\n" +
+                                    "        <input type=\"text\" name=" + item + " placeholder=\"" + json[item] + "\">\n" +
                                     "    </div>\n")
                         }
                     }
