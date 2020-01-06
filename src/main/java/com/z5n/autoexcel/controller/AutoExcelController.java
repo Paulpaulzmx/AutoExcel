@@ -1,6 +1,6 @@
 package com.z5n.autoexcel.controller;
 
-import com.alibaba.excel.EasyExcel;
+import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.ResultBody;
 import com.z5n.autoexcel.model.entity.StuMsg;
@@ -8,25 +8,24 @@ import com.z5n.autoexcel.model.entity.Template;
 import com.z5n.autoexcel.service.StuMsgService;
 import com.z5n.autoexcel.service.TemplateService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Slf4j
 @RestController
 public class AutoExcelController {
 
-    private final StuMsgService stuMsgService;
     private final TemplateService templateService;
+    private final StuMsgService stuMsgService;
 
-    public AutoExcelController(StuMsgService stuMsgService,
-                               TemplateService templateService) {
-        this.stuMsgService = stuMsgService;
+    public AutoExcelController(TemplateService templateService, StuMsgService stuMsgService) {
         this.templateService = templateService;
+        this.stuMsgService = stuMsgService;
     }
 
     @RequestMapping(value = "/submit", method = RequestMethod.POST)

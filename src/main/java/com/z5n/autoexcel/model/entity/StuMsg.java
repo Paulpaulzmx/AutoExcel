@@ -25,8 +25,8 @@ public class StuMsg extends BaseEntity {
     /**
      * 学生信息表主键
      */
-    @Column(name = "stu_info_id", columnDefinition = "int(11) not null")
-    private Integer stuInfoId;
+//    @Column(name = "stu_info_id", columnDefinition = "int(11) not null")
+//    private Integer stuInfoId;
 
     /**
      * 模板表主键

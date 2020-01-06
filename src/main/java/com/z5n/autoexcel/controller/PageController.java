@@ -14,7 +14,7 @@ public class PageController {
      * @return 主页
      */
     // 访问"/+id"获取填写模板
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/goBasis/{id}")
     public String index(){
         return "basis";
     }

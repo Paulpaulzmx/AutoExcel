@@ -1,5 +1,6 @@
 package com.z5n.autoexcel.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.service.base.CurdService;
 
@@ -12,4 +13,5 @@ import com.z5n.autoexcel.service.base.CurdService;
  * @Version: 1.0
  **/
 public interface StuMsgService extends CurdService<StuMsg, Integer> {
+    public StuMsg submitMsg(JSONObject jsonObject);
 }
