@@ -17,8 +17,8 @@ public interface TemplateService extends CurdService<Template, Integer> {
     /**
      *  从excel文件中读取头形成模板
      * @param file
-     * @param stuInfoId
+     * @param uploaderId
      * @return
      */
-    Template readExcelHeadTemplate(MultipartFile file, Integer stuInfoId);
+    Template readExcelHeadTemplate(MultipartFile file, Integer uploaderId);
 }

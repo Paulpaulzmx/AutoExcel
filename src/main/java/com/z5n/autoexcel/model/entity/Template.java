@@ -27,8 +27,8 @@ public class Template extends BaseEntity {
     @Column(name = "id")
     private Integer id;
 
-    @Column(name = "stu_info_id", columnDefinition = "int(11) not null")
-    private Integer stuInfoId;
+    @Column(name = "uploader_id", columnDefinition = "int(11) not null")
+    private Integer uploaderId;
 
     @Column(name = "head_content", columnDefinition = "text not null")
     private String headContent;

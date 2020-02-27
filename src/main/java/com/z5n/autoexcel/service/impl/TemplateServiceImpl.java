@@ -39,7 +39,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
     }
 
     @Override
-    public Template readExcelHeadTemplate(MultipartFile file, Integer stuInfoId) {
+    public Template readExcelHeadTemplate(MultipartFile file, Integer uploaderId) {
 
         String origName = file.getOriginalFilename();
         if (StringUtils.isEmpty(origName)) {
@@ -76,7 +76,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
 
         Template template = new Template();
         template.setHeadContent(JSON.toJSONString(map));
-        template.setStuInfoId(stuInfoId);
+        template.setUploaderId(uploaderId);
         return templateRepository.save(template);
     }
 }

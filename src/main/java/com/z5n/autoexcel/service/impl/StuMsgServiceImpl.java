@@ -5,8 +5,9 @@ import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.repository.StuMsgRepository;
 import com.z5n.autoexcel.service.StuMsgService;
 import com.z5n.autoexcel.service.base.AbstractCurdService;
-import io.swagger.models.auth.In;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 /**
  * @program: autoexcel
@@ -19,8 +20,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, Integer> implements StuMsgService {
 
+    private final StuMsgRepository stuMsgRepository;
+
     public StuMsgServiceImpl(StuMsgRepository stuMsgRepository) {
         super(stuMsgRepository);
+        this.stuMsgRepository = stuMsgRepository;
     }
 
     /**
@@ -37,5 +41,14 @@ public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, Integer> impl
         stuMsg.setContent(jsonObject.toJSONString());
         this.create(stuMsg);
         return stuMsg;
+    }
+
+    /**
+     * 根据模板id查询所有已提交的StuMsg
+     * @param id url中的模板id
+     * @return 所有已提交的StuMsg
+     */
+    public ArrayList<StuMsg> getMsgByTemplateId(Integer id){
+        return (ArrayList<StuMsg>) stuMsgRepository.findByTemplateId(id);
     }
 }

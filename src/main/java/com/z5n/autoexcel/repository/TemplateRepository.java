@@ -1,6 +1,7 @@
 package com.z5n.autoexcel.repository;
 
 import com.z5n.autoexcel.model.entity.Template;
+import org.springframework.stereotype.Repository;
 
 /**
  * @program: autoexcel
@@ -10,5 +11,6 @@ import com.z5n.autoexcel.model.entity.Template;
  * @Date: 2019/12/22 19:43
  * @Version: 1.0
  **/
+@Repository
 public interface TemplateRepository extends BaseRepository<Template, Integer> {
 }

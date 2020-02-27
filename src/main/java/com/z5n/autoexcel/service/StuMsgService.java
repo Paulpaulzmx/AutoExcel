@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.service.base.CurdService;
 
+import java.util.ArrayList;
+
 /**
  * @program: autoexcel
  * @Interface: StuMsgService
@@ -14,4 +16,6 @@ import com.z5n.autoexcel.service.base.CurdService;
  **/
 public interface StuMsgService extends CurdService<StuMsg, Integer> {
     public StuMsg submitMsg(JSONObject jsonObject);
+
+    public ArrayList<StuMsg> getMsgByTemplateId(Integer id);
 }
