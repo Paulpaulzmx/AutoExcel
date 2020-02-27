@@ -28,6 +28,11 @@ public class AutoExcelController {
         this.stuMsgService = stuMsgService;
     }
 
+    /**
+     * (填表人)提交一条信息
+     * @param submitMsg json形式的信息
+     * @return 是否成功
+     */
     @RequestMapping(value = "/submit", method = RequestMethod.POST)
     public ResultBody submit(@RequestBody String submitMsg) {
         JSONObject jsonObject = JSONObject.parseObject(submitMsg);
@@ -36,17 +41,29 @@ public class AutoExcelController {
     }
 
 
+    /**
+     * 上传表格作为模板
+     * @param file
+     * @param uploaderId 上传者id
+     * @return 是否成功
+     */
     @RequestMapping(value = "uploadTemplate", method = RequestMethod.POST)
-    public ResultBody uploadTemplate(MultipartFile file, Integer stuInfoId) {
-        if (file.isEmpty() || stuInfoId == null) {
+    public ResultBody uploadTemplate(MultipartFile file, Integer uploaderId) {
+        if (file.isEmpty() || uploaderId == null) {
             throw new BusinessException("参数不能为空");
         }
 
-        Template template = templateService.readExcelHeadTemplate(file, stuInfoId);
+        Template template = templateService.readExcelHeadTemplate(file, uploaderId);
 
         return ResultBody.success(template);
     }
 
+
+    /**
+     * basis页面请求表头生成填表页面
+     * @param id 请求的表格id
+     * @return 返回表格id为id的表头
+     */
     @RequestMapping(value = "/template/{id}", method = RequestMethod.GET)
     public ResultBody getTemplateById(@PathVariable("id") Integer id) {
         if (id == null) {
@@ -60,8 +77,17 @@ public class AutoExcelController {
     }
 
 
-    @RequestMapping(value = "/getExcel", method = RequestMethod.GET)
-    public void getExcel() {
+    /**
+     * 收集完成后，请求生成表格
+     * @param id 请求生成的表格id
+     * @return 返回excel表格
+     */
+    @RequestMapping(value = "/getExcel/{id}", method = RequestMethod.GET)
+    public ResultBody getExcel(@PathVariable("id") Integer id) {
+            if(id == null){
+            throw new BusinessException("id不能为空");
+        }
+        return ResultBody.success(stuMsgService.getMsgByTemplateId(id));
         // 导出整合好数据的excel
     }
 }
