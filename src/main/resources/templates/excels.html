@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <link href="../static/bootstrap4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../static/css/bootstrap-table.min.css" rel="stylesheet">
+    <!--zmxtodo 删除../static-->
+    <title>EXCEL纵览</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            padding-top: 60px;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content {
+            flex: 1;
+        }
+
+    </style>
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="nav" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">EXCEL纵览</a>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- 中间的主体部分 -->
+<div class="content container">
+    <!--    这里写页面内容   -->
+
+    <table id="table"></table>
+</div>
+
+<!-- 底部footer -->
+<div style="
+    min-width: 100%;
+    background-color: #f8f8f8;
+    padding: 15px;">
+    <footer class="text-center text-muted"
+            style="margin-top: auto;margin-bottom: auto">
+        统计信息纵览
+    </footer>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="../static/js/jquery-3.4.1.min.js"></script>
+<script src="../static/bootstrap4/js/bootstrap.min.js" type="application/javascript"></script>
+<script src="../static/js/bootstrap-table.min.js" type="application/javascript"></script>
+
+<script>
+    $('#table').bootstrapTable({
+        url: 'data1.json',
+        columns: [{
+            field: 'id',
+            title: 'Item ID'
+        }, {
+            field: 'name',
+            title: 'Item Name'
+        }, {
+            field: 'price',
+            title: 'Item Price'
+        }]
+    })</script>
+
+</body>
+</html>
