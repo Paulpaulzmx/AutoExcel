@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-    <link href="../static/bootstrap4/css/bootstrap.min.css" rel="stylesheet">
-    <link href="../static/css/bootstrap-table.min.css" rel="stylesheet">
-    <!--zmxtodo 删除../static-->
+    <link href="/bootstrap4/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-table.min.css" rel="stylesheet">
     <title>EXCEL纵览</title>
 
     <style>
@@ -62,24 +61,50 @@
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="../static/js/jquery-3.4.1.min.js"></script>
-<script src="../static/bootstrap4/js/bootstrap.min.js" type="application/javascript"></script>
-<script src="../static/js/bootstrap-table.min.js" type="application/javascript"></script>
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/bootstrap4/js/bootstrap.min.js" type="application/javascript"></script>
+<script src="/js/bootstrap-table.min.js" type="application/javascript"></script>
 
 <script>
-    $('#table').bootstrapTable({
-        url: 'data1.json',
-        columns: [{
-            field: 'id',
-            title: 'Item ID'
-        }, {
-            field: 'name',
-            title: 'Item Name'
-        }, {
-            field: 'price',
-            title: 'Item Price'
-        }]
-    })</script>
+
+    $(document).ready(function(){
+        $.ajax({
+            url: 'getAllExcel',
+            type: 'get',
+            dataType: 'json',
+            success(resultObject){
+                var data = resultObject.result;
+
+                $('#table').bootstrapTable({
+                    data: data,
+                    columns: [
+                        {
+                            field: 'id',
+                            title: 'ID'
+                        },
+                        {
+                            field: 'uploaderId',
+                            title: '上传者id'
+                        },
+                        {
+                            field: 'tableName',
+                            title: '表名'
+                        },
+                        {
+                            field: 'headContent',
+                            title: '表头信息'
+                        }
+                    ]
+                })
+            },
+            error(errorMsg){
+                alert(errorMsg);
+            }
+        })
+    });
+
+
+</script>
 
 </body>
 </html>

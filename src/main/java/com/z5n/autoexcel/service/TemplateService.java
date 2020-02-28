@@ -4,6 +4,8 @@ import com.z5n.autoexcel.model.entity.Template;
 import com.z5n.autoexcel.service.base.CurdService;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 /**
  * @program: autoexcel
  * @Interface: TemplateService
@@ -21,4 +23,7 @@ public interface TemplateService extends CurdService<Template, Integer> {
      * @return
      */
     Template readExcelHeadTemplate(MultipartFile file, Integer uploaderId);
+
+
+    List<Template> getExcelList();
 }

@@ -69,7 +69,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
             throw new BusinessException("读取数据为空");
         }
 
-        Map<Integer, String> map = headList.get(1);
+        Map<Integer, String> map = headList.get(0);
         if (CollectionUtils.isEmpty(map)) {
             throw new BusinessException("读取表头数据为空");
         }
@@ -79,4 +79,11 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
         template.setUploaderId(uploaderId);
         return templateRepository.save(template);
     }
+
+    @Override
+    public List<Template> getExcelList() {
+        return templateRepository.findAll();
+    }
+
+
 }
