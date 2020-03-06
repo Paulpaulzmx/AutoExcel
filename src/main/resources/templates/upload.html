@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta lang="zh">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/css/fileinput.min.css" rel="stylesheet">
+    <link href="/css/fileinput-rtl.min.css" rel="stylesheet">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/css/register.css" rel="stylesheet">
+
+    <title>上传表格</title>
+
+</head>
+<body>
+
+    <input id="input-id" type="file" class="file">
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+    <script src="/js/jquery-3.4.1.min.js"></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/fileinput.min.js" type="application/javascript"></script>
+    <script src="/js/locales/fa.js" type="application/javascript"></script>
+    <script src="/js/locales/zh.js" type="application/javascript"></script>
+
+    <script>
+        $("#input-id").fileinput({
+            maxFileCount: 5,
+            language: "zh",
+            allowedFileExtensions: ["xls", "xlsx", "pdf"],
+            showUpload: true,
+            uploadAsync: true,
+            theme: "fa",
+        });
+    </script>
+
+</body>
+</html>

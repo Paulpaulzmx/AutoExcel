@@ -70,27 +70,32 @@
     $(document).ready(function(){
         $.ajax({
             url: 'getAllExcel',
-            type: 'get',
-            dataType: 'json',
             success(resultObject){
                 var data = resultObject.result;
 
+                // 通过js控制表格行为
                 $('#table').bootstrapTable({
                     data: data,
+                    pangination: true,
+                    search: true,
                     columns: [
                         {
+                            sortable: true,
                             field: 'id',
                             title: 'ID'
                         },
                         {
+                            sortable: true,
                             field: 'uploaderId',
                             title: '上传者id'
                         },
                         {
+                            sortable: true,
                             field: 'tableName',
                             title: '表名'
                         },
                         {
+                            sortable: true,
                             field: 'headContent',
                             title: '表头信息'
                         }
