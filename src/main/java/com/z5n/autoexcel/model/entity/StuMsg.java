@@ -18,7 +18,6 @@ import javax.persistence.*;
 public class StuMsg extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "uuid")
     private String uuid;
 
@@ -31,8 +30,8 @@ public class StuMsg extends BaseEntity {
     /**
      * 模板表主键
      */
-    @Column(name = "template_id", columnDefinition = "int(11) not null")
-    private Integer templateId;
+    @Column(name = "template_id", length = 32)
+    private String templateId;
 
     @Column(name = "content", columnDefinition = "text not null")
     private String content;

@@ -5,6 +5,7 @@ import com.z5n.autoexcel.model.entity.StuMsg;
 import com.z5n.autoexcel.repository.StuMsgRepository;
 import com.z5n.autoexcel.service.StuMsgService;
 import com.z5n.autoexcel.service.base.AbstractCurdService;
+import com.z5n.autoexcel.utils.UuidUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,11 +35,12 @@ public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, String> imple
      * @return 返回新增的StuMsg实体
      */
     public StuMsg submitMsg(JSONObject jsonObject){
-        Integer templateId = jsonObject.getInteger("templateId");
+        String templateId = jsonObject.getString("templateId");
         jsonObject.remove("templateId");
         StuMsg stuMsg = new StuMsg();
         stuMsg.setTemplateId(templateId);
         stuMsg.setContent(jsonObject.toJSONString());
+        stuMsg.setUuid(UuidUtils.randomUUIDWithoutDash());
         this.create(stuMsg);
         return stuMsg;
     }

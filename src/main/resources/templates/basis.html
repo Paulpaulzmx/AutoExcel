@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -120,8 +120,8 @@
     // 获取url中的templateId
     function getTemplateId() {
         var url = window.location.href;
-        var templateId = parseInt(url.substring(url.lastIndexOf("/") + 1));
-        if (!isNaN(templateId)) {
+        var templateId = url.substring(url.lastIndexOf("/") + 1);
+        if (!(typeof templateId == "undefined" || templateId == null || templateId == "")) {
             $("#hiddenId").val(templateId);
             return (templateId);
         }
@@ -130,7 +130,7 @@
     $(document).ready(function () {
         templateId = getTemplateId();
         $.ajax({
-            url: "/template/" + templateId,
+            url: "/user/template/" + templateId,
             success(result) {
                 if (result.code == "200") {
                     // 请求模板成功，生成前端表单页面

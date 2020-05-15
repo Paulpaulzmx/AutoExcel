@@ -27,4 +27,6 @@ public interface TemplateService extends CurdService<Template, String> {
 
     List<Template> getExcelList();
     List<Template> getExcelList(String uploaderId);
+
+    Template updateTemplate(String templateId, String newTemplate);
 }

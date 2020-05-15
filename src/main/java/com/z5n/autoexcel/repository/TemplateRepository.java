@@ -15,4 +15,5 @@ import java.util.List;
 @Repository
 public interface TemplateRepository extends BaseRepository<Template, String> {
     List<Template> findAllByUploaderId(String uploaderId);
+    Template findByUuid(String templateId);
 }

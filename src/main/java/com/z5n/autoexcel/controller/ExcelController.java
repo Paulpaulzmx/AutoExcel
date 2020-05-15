@@ -11,6 +11,7 @@ import com.z5n.autoexcel.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -77,5 +78,15 @@ public class ExcelController {
         }catch (Exception e){
             return ResultBody.error(e.getMessage());
         }
+    }
+
+    @ApiOperation("在editTemplate页面更新template表头字段")
+    @RequestMapping(value = "/updateTemplate", method = RequestMethod.POST)
+    public ResultBody updateTemplate(@RequestBody String newTemplate){
+        JSONObject msg = JSONObject.parseObject(newTemplate);
+        String templateId = msg.getString("templateId");
+        msg.remove("templateId");
+        Template updatedTemplate = templateService.updateTemplate(templateId, msg.toJSONString());
+        return ResultBody.success(updatedTemplate);
     }
 }
