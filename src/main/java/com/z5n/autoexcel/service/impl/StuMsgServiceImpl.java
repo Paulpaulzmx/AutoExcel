@@ -18,7 +18,7 @@ import java.util.ArrayList;
  * @Version: 1.0
  **/
 @Service
-public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, Integer> implements StuMsgService {
+public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, String> implements StuMsgService {
 
     private final StuMsgRepository stuMsgRepository;
 
@@ -48,7 +48,7 @@ public class StuMsgServiceImpl extends AbstractCurdService<StuMsg, Integer> impl
      * @param id url中的模板id
      * @return 所有已提交的StuMsg
      */
-    public ArrayList<StuMsg> getMsgByTemplateId(Integer id){
+    public ArrayList<StuMsg> getMsgByTemplateId(String id){
         return (ArrayList<StuMsg>) stuMsgRepository.findByTemplateId(id);
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
+/**打印所有到controller中方法的请求日志
  * @author zmx
  * @date 2020/1/6 17:12
  */

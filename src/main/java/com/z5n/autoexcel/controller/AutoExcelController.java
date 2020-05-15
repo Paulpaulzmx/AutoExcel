@@ -38,24 +38,7 @@ public class AutoExcelController {
     }
 
 
-    /**
-     * 上传表格作为模板
-     *
-     * @param file
-     * @param uploaderId 上传者id
-     * @return 是否成功
-     */
-    @ApiOperation("执行上传表格的接口")
-    @RequestMapping(value = "uploadTemplate", method = RequestMethod.POST)
-    public ResultBody uploadTemplate(MultipartFile file, Integer uploaderId) {
-        if (file.isEmpty() || uploaderId == null) {
-            throw new BusinessException("参数不能为空");
-        }
 
-        Template template = templateService.readExcelHeadTemplate(file, uploaderId);
-
-        return ResultBody.success(template);
-    }
 
 
     /**
@@ -66,8 +49,8 @@ public class AutoExcelController {
      */
     @ApiOperation("页面自动获取表格模板的接口")
     @ApiImplicitParam(name = "id", required = true, value = "模板id")
-    @RequestMapping(value = "/template/{id}", method = RequestMethod.GET)
-    public ResultBody getTemplateById(@PathVariable("id") Integer id) {
+    @RequestMapping(value = "/user/template/{id}", method = RequestMethod.GET)
+    public ResultBody getTemplateById(@PathVariable("id") String id) {
         if (id == null) {
             throw new BusinessException("参数不能为空");
         }
@@ -115,7 +98,7 @@ public class AutoExcelController {
     @ApiOperation("请求导出生成表格的接口")
     @ApiImplicitParam(name = "id", required = true, value = "表格id")
     @RequestMapping(value = "/downloadExcel/{id}", method = RequestMethod.GET)
-    public ResultBody downloadExcel(@PathVariable("id") Integer id) {
+    public ResultBody downloadExcel(@PathVariable("id") String id) {
         if (id == null) {
             throw new BusinessException("id不能为空");
         }

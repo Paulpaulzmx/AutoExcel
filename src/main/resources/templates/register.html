@@ -1,15 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="/css/bootstrap.min.css" rel="stylesheet">
-    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/css/register.css" rel="stylesheet">
 
-    <title>xx信息统计</title>
+    <title>Register</title>
 
     <style>
         html {
@@ -26,8 +25,6 @@
             flex: 1;
         }
     </style>
-
-
 </head>
 <body>
 <!-- 顶部导航栏 -->
@@ -35,7 +32,7 @@
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
-                <a class="navbar-brand" href="#">xx信息统计</a>
+                <a class="navbar-brand" href="#">表格自动收集系统</a>
             </div>
         </div>
     </nav>
@@ -48,52 +45,81 @@
         <div id="formContent">
             <!-- 注册方式分类 nav-pills -->
             <ul class="nav nav-pills nav-justified">
-                <li class="active"><a href="#form" data-toggle="pill">信息填写</a></li>
+                <li class="active"><a href="#person" data-toggle="pill">个人注册</a></li>
             </ul>
 
-            <div class="tab-content ">
-                <form id="form" class="tab-pane fade in active">
-                    <div>
-                        <br/>
+            <div class="tab-content">
+                <!-- 个人注册 -->
+                <form id="person" class="tab-pane fade in active">
+                    <!-- 个人账号信息 -->
+                    <div id="formNotNull">
+                        <h2>账号基本信息</h2>
                         <div class="form-group">
-                            <label>学号</label>
-                            <input type="text" name="stuId" placeholder="学号">
+                            <label>用户名</label>
+                            <input type="text" name="username" placeholder="用户名">
                         </div>
                         <div class="form-group">
-                            <label>姓名</label>
-                            <input type="text" name="stuName" placeholder="姓名">
+                            <label>密码</label>
+                            <input type="password" id="password" name="password" placeholder="密码">
                         </div>
                         <div class="form-group">
-                            <label>班级</label>
-                            <input type="text" name="stuClass" value="16软一" readonly>
-                        </div>
-                        <div class="form-group form-row">
-                            <label>联系电话</label>
-                            <input type="text" name="stuTel" placeholder="联系电话">
+                            <label>确认密码</label>
+                            <input type="password" id="passwordVerify" name="passwordVerify" placeholder="密码">
+                            <span class="glyphicon glyphicon-remove form-control-feedback"
+                                  style="display: none;"></span>
                         </div>
                         <div class="form-group">
-                            <label for="selectItem">选择单位</label>
-                            <select id="selectItem" name="stuChoice" class="form-control">
-                                <option value="1">JavaWeb</option>
-                                <option value="2">Python爬虫</option>
-                                <option value="3">软件测试</option>
-                                <option value="4">其他</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>备注</label>
-                            <input type="text" name="note" placeholder="备注">
+                            <label>邮箱</label>
+                            <input type="text" id="emailAddress" name="email" placeholder="邮箱，用于找回密码">
                         </div>
                     </div>
+                    <!-- 个人信息 -->
+                    <div>
+                        <h2>个人信息（非必填，用于快速填表）</h2>
+                        <div class="form-group">
+                            <label>真实姓名</label>
+                            <input type="text" name="trueName" placeholder="姓名">
+                        </div>
+                        <div class="form-group" id="sl-sex" style="display: flex;">
+                            <label style="margin-left: 16px;">性别</label>
+                            <div style="margin-left: 30px;">
+                                <input type="radio" name="gender" value="male">男
+                                <input type="radio" name="gender" value="female">女
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>学号</label>
+                            <input type="text" id="stuNum" name="stuNum" placeholder="学号">
+                        </div>
+                        <div class="form-group">
+                            <label>身份证号</label>
+                            <input type="text" name="idCardNum" placeholder="身份证号">
+                        </div>
+                        <div class="form-group">
+                            <label>手机号</label>
+                            <input type="text" id="phoneNum" name="tel" placeholder="手机号码">
+                        </div>
+                        <div class="form-group">
+                            <label>qq</label>
+                            <input type="text" name="qq" placeholder="qq">
+                        </div>
+                        <div class="form-group">
+                            <label>家庭住址</label>
+                            <input type="text" id="address" name="address" placeholder="家庭住址">
+                        </div>
 
-                    <input type="button" onclick="sss()" class="btn btn-lg btn-success"
-                           value="提交">
+                    </div>
+                    <input type="button" data-toggle="modal" onclick="getVerifyCode()"
+                           data-target="#inputVerifyCodeModal"
+                           class="btn btn-lg btn-success" value="注册">
                 </form>
+            </div>
+            <div id="formFooter">
+                <a class="underlineHover" href="login.html">返回登陆</a>
             </div>
 
         </div>
     </div>
-
 </div>
 
 <!-- 底部footer -->
@@ -103,49 +129,113 @@
     padding: 15px;">
     <footer class="text-center text-muted"
             style="margin-top: auto;margin-bottom: auto">
-        统计信息
+        表格自动收集系统
     </footer>
+</div>
+
+<!-- 弹出式Modal -->
+<div class="modal fade" id="inputVerifyCodeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">验证码已发送至您的邮箱</h4>
+            </div>
+            <div class="modal-body">
+                <label>输入验证码</label>
+                <input type="text" id="verifyCode" class="input-group">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="registerSubmit()" class="btn btn-primary">提交</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
 <script src="/js/jquery-3.4.1.min.js"></script>
-<script src="/js/bootstrap.min.js" type="application/javascript"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/bootstrap.min.js"></script>
+
 <script>
-    $(document).ready(function () {
-        $(".lili").click(function () {
-                if ($(this).hasClass("active")) {
-                    $(this).removeClass("active");
-                } else {
-                    $(this).addClass("active");
-                    $(this).siblings().removeClass("active");
-                }
-            }
-        );
-    });
-</script>
-<script>
-    function sss() {
-        // $("#form").ad           d
+    function registerSubmit() {
+
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/submit",
-            data: $("#form").serialize(),
+            url: "/register/newUser",
+            data: $('#person').serialize() + "&verifyCode=" + $("#verifyCode").val(),
             success: function (result) {
-                console.log(result);//打印服务端返回的数据(调试用)
-                if (result.resultCode == 200) {
-                    alert("提交成功");
+                console.log("result:" + result);//打印服务端返回的数据(调试用)
+                if (result.code == 200) {
+                    alert("注册成功");
+                    window.location.href = "/"  //返回首页
+                } else if (result.code == -1) {
+                    alert(result.message);
                 }
             },
-            error: function () {
+            error: function (result) {
+                console.log(result);
                 alert("异常！");
             }
         });
-
     }
+
+    function getVerifyCode() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/register/verifyCode",
+            data: "emailAddress=" + $("#emailAddress").val(),
+            success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
+            },
+            error: function (result) {
+                console.log(result);
+                alert("验证码异常！");
+            }
+        });
+    }
+
+    $(function () {
+        //检测邮箱格式
+        $("#emailAddress").blur(function () {
+            var search_str = /^[\w\-\.]+@[\w\-\.]+(\.\w+)+$/;
+            var email_val = $("#emailAddress").val();
+            if (!search_str.test(email_val) && email_val != "") {
+                alert("邮箱格式错误");
+            }
+        });
+
+        //检测密码一致
+        $("#passwordVerify").blur(function () {
+            if (!$("#password").val() || $("#passwordVerify").val() != $("#password").val()) {
+                alert("两次密码不一致!");
+            }
+        });
+
+        //检测手机号格式
+        $("#phoneNum").blur(function () {
+            var reg = /^1[34578]\d{9}$/;
+            if (!reg.test($("#phoneNum").val()) && $("#phoneNum").val() != "") {
+                alert("请输入正确的手机号！")
+            }
+        });
+        $("#stuNum").blur(function () {
+            var reg = /^\d{10}$/;
+            if (!reg.test($("#stuNum").val()) && $("#stuNum").val() != "") {
+                alert("请输入正确的学号！")
+            }
+        });
+
+    });
+
 </script>
+
 
 </body>
 </html>

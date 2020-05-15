@@ -20,5 +20,5 @@ public interface BaseRepository<ENTITY, ID> extends JpaRepository<ENTITY, ID> {
      * @param ids
      * @return long
      */
-    long deleteByIdIn(@NonNull Iterable<ID> ids);
+    long deleteByUuidIn(@NonNull Iterable<ID> ids);
 }

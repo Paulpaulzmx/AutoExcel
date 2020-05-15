@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/fileinput.min.css" rel="stylesheet">
+    <link href="/css/fileinput-rtl.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+
+    <title>表格自动收集系统</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px;
+        }
+
+        .content {
+            flex: 1;
+        }
+    </style>
+
+</head>
+<body>
+<!--导航栏部分-->
+<div class="nav" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/user/index">表格自动收集系统</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a>上传表格</a></li>
+                    <li><a href="/user/myExcels">我的表格</a></li>
+                    <li><a href="/user/history">填表历史</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a id="dropdown" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                           role="button" aria-haspopup="true" aria-expanded="false">Dropdown
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">个人信息修改</a></li>
+                            <li><a href="/logout">退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- 中间的主体部分 -->
+<div class="content">
+    <!--    这里写页面内容   -->
+    <div id="main" class="container">
+        <div class="row">
+            <div id="main-left" class="col-sm-12 col-md-12">
+                <!-- 上传插件部分 -->
+                <input id="input-id" name="file" type="file" class="file">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部footer -->
+<div style="
+    min-width: 100%;
+    background-color: #f8f8f8;
+    padding: 15px;">
+    <footer class="text-center text-muted" style="margin-top: auto;margin-bottom: auto">表格自动收集系统</footer>
+</div>
+<!-- Bootstrap core JavaScript
+==================================================
+-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script>window.jQuery || document.write('<script src="/js/jquery-3.4.1.min.js"><\/script>')</script>
+<script src="/js/bootstrap.min.js"></script>
+<script src="/js/fileinput.min.js" type="application/javascript"></script>
+<script src="/js/locales/fa.js" type="application/javascript"></script>
+<script src="/js/locales/zh.js" type="application/javascript"></script>
+
+<script>
+    $(document).ready(function () {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/user/getName",
+            success: function (result) {
+                if (result.code == 200) {
+                    $("#dropdown").html(result.result + " <span class=\"caret\"></span>");
+                } else if (result.code == -1) {
+                    alert(result.message);
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                alert("异常！");
+            }
+        });
+    });
+</script>
+
+<!--上传插件 bootstrap-fileinput-->
+<script>
+    $("#input-id").fileinput({
+        language: "zh",
+        uploadUrl: "../uploadTemplate",
+        uploadExtraData: {},
+        allowedFileExtensions: ["xls", "xlsx"],
+        showUpload: true,
+        uploadAsync: true,
+        theme: "fa",
+        browseOnZoneClick: true,
+        dropZoneTitle: "点击这里上传表格...<br/>或拖拽表格文件到这里...",
+        dropZoneClickTitle: "",
+    }).on('fileuploaded', function (event, data, previewId, index) {
+        // var form = data.form, files = data.files, reader = data.reader, extra = data.extra,
+        var response = data.response;
+        if (response.status == "OK") {
+            alert("上传成功");
+            window.location.href = "/user/editTemplate/"+response.templateId;
+        }
+    }).on('fileerror', function (event, data, msg) {  //一个文件上传失败
+        alert('文件上传失败！' + msg);
+    });
+</script>
+
+</body>
+</html>

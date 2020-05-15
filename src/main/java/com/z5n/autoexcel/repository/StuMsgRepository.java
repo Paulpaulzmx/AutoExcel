@@ -9,6 +9,6 @@ import java.util.List;
  * @author z5n
  */
 @Repository
-public interface StuMsgRepository extends BaseRepository<StuMsg, Integer> {
-    List<StuMsg> findByTemplateId(Integer templateId);
+public interface StuMsgRepository extends BaseRepository<StuMsg, String> {
+    List<StuMsg> findByTemplateId(String templateId);
 }

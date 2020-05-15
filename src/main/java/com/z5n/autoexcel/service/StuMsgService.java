@@ -14,8 +14,8 @@ import java.util.ArrayList;
  * @Date: 2019/12/22 9:57
  * @Version: 1.0
  **/
-public interface StuMsgService extends CurdService<StuMsg, Integer> {
+public interface StuMsgService extends CurdService<StuMsg, String> {
     public StuMsg submitMsg(JSONObject jsonObject);
 
-    public ArrayList<StuMsg> getMsgByTemplateId(Integer id);
+    public ArrayList<StuMsg> getMsgByTemplateId(String id);
 }

@@ -2,6 +2,7 @@ package com.z5n.autoexcel.repository;
 
 import com.z5n.autoexcel.model.entity.Template;
 import org.springframework.stereotype.Repository;
+import java.util.List;
 
 /**
  * @program: autoexcel
@@ -12,5 +13,6 @@ import org.springframework.stereotype.Repository;
  * @Version: 1.0
  **/
 @Repository
-public interface TemplateRepository extends BaseRepository<Template, Integer> {
+public interface TemplateRepository extends BaseRepository<Template, String> {
+    List<Template> findAllByUploaderId(String uploaderId);
 }

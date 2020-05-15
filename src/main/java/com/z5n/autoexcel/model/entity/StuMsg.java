@@ -19,8 +19,8 @@ public class StuMsg extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "uuid")
+    private String uuid;
 
     /**
      * 学生信息表主键

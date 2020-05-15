@@ -198,7 +198,7 @@ public abstract class AbstractCurdService<ENTITY, ID> implements CurdService<ENT
             log.warn(entityName + " id collection is empty");
             return;
         }
-        repository.deleteByIdIn(ids);
+        repository.deleteByUuidIn(ids);
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.List;
  * @Date: 2019/12/22 19:41
  * @Version: 1.0
  **/
-public interface TemplateService extends CurdService<Template, Integer> {
+public interface TemplateService extends CurdService<Template, String> {
 
     /**
      *  从excel文件中读取头形成模板
@@ -22,8 +22,9 @@ public interface TemplateService extends CurdService<Template, Integer> {
      * @param uploaderId
      * @return
      */
-    Template readExcelHeadTemplate(MultipartFile file, Integer uploaderId);
+    Template readExcelHeadTemplate(MultipartFile file, String uploaderId);
 
 
     List<Template> getExcelList();
+    List<Template> getExcelList(String uploaderId);
 }

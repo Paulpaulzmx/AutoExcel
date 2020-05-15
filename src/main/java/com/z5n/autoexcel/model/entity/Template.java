@@ -22,13 +22,15 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 public class Template extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Id()
+    @Column(name = "uuid", length = 32)
+    private String uuid;
 
-    @Column(name = "uploader_id", columnDefinition = "int(11) not null")
-    private Integer uploaderId;
+    @Column(name = "uploader_id", length = 32, columnDefinition = " not null")
+    private String uploaderId;
+
+    @Column(name = "file_name",length = 255, columnDefinition = " not null")
+    private String fileName;
 
     @Column(name = "head_content", columnDefinition = "text not null")
     private String headContent;

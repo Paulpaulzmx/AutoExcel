@@ -9,6 +9,7 @@ import com.z5n.autoexcel.model.entity.Template;
 import com.z5n.autoexcel.repository.TemplateRepository;
 import com.z5n.autoexcel.service.TemplateService;
 import com.z5n.autoexcel.service.base.AbstractCurdService;
+import com.z5n.autoexcel.utils.UuidUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -29,7 +30,7 @@ import java.util.Map;
  **/
 @Slf4j
 @Service
-public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> implements TemplateService {
+public class TemplateServiceImpl extends AbstractCurdService<Template, String> implements TemplateService {
 
     private final TemplateRepository templateRepository;
 
@@ -39,7 +40,7 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
     }
 
     @Override
-    public Template readExcelHeadTemplate(MultipartFile file, Integer uploaderId) {
+    public Template readExcelHeadTemplate(MultipartFile file, String uploaderId) {
 
         String origName = file.getOriginalFilename();
         if (StringUtils.isEmpty(origName)) {
@@ -75,8 +76,10 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
         }
 
         Template template = new Template();
+        template.setUuid(UuidUtils.randomUUIDWithoutDash());
         template.setHeadContent(JSON.toJSONString(map));
         template.setUploaderId(uploaderId);
+        template.setFileName(origName.substring(0,origName.lastIndexOf(".")));
         return templateRepository.save(template);
     }
 
@@ -85,5 +88,8 @@ public class TemplateServiceImpl extends AbstractCurdService<Template, Integer> 
         return templateRepository.findAll();
     }
 
-
+    @Override
+    public List<Template> getExcelList(String uploaderId) {
+        return templateRepository.findAllByUploaderId(uploaderId);
+    }
 }
