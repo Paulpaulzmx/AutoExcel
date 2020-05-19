@@ -3,8 +3,12 @@ package com.z5n.autoexcel.utils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -13,9 +17,9 @@ import java.util.concurrent.TimeUnit;
  * @author johnniang
  * @date 3/18/19
  */
-public class DateUtils {
+public class DateAndTimeUtils {
 
-    private DateUtils() {
+    private DateAndTimeUtils() {
     }
 
     /**
@@ -87,5 +91,13 @@ public class DateUtils {
                 result = date;
         }
         return result;
+    }
+
+    public static String UtcTimeConverter(String UtcTime) throws ParseException {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss.sssZ");
+        Date result = df.parse(UtcTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
+        return sdf.format(result);
     }
 }

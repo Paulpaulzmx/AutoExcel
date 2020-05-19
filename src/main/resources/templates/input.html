@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="zh-cn" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
-    <link href="/css/bootstrap-table.min.css" rel="stylesheet">
     <link href="/css/register.css" rel="stylesheet">
 
-    <title>表格自动收集系统</title>
+    <title>xx信息统计</title>
 
     <style>
         html {
@@ -20,13 +20,13 @@
             min-height: 100%;
             display: flex;
             flex-direction: column;
-            padding-top: 70px;
         }
 
         .content {
             flex: 1;
         }
     </style>
+
 
 </head>
 <body>
@@ -72,19 +72,20 @@
     <!--    这里写页面内容   -->
     <div class="wrapper fadeInDown">
         <div id="formContent">
-            <!-- nav-pills -->
+            <!-- 注册方式分类 nav-pills -->
             <ul class="nav nav-pills nav-justified">
-                <li class="active"><a href="#form" data-toggle="pill">表头字段修改</a></li>
+                <li class="active"><a href="#form" data-toggle="pill">信息填写</a></li>
             </ul>
+
             <div class="tab-content ">
                 <form id="form" class="tab-pane fade in active">
                     <br/>
                     <div id="FormBegin">
                         <div class="form-group">
-                            <input type="hidden" id="hiddenId" name="templateId" value="">
+                            <input type="hidden" id="hiddenId" name="excelId" value="">
                         </div>
                     </div>
-                    <input type="button" onclick="sss()" class="btn btn-lg btn-success"
+                    <input type="button" onclick="submitMsg()" class="btn btn-lg btn-success"
                            value="提交">
                 </form>
             </div>
@@ -99,9 +100,11 @@
     min-width: 100%;
     background-color: #f8f8f8;
     padding: 15px;">
-    <footer class="text-center text-muted" style="margin-top: auto;margin-bottom: auto">表格自动收集系统</footer>
+    <footer class="text-center text-muted"
+            style="margin-top: auto;margin-bottom: auto">
+        统计信息
+    </footer>
 </div>
-
 
 <!-- Bootstrap core JavaScript
 ================================================== -->
@@ -110,25 +113,25 @@
 <script src="/js/bootstrap.min.js" type="application/javascript"></script>
 <script>
 
-    //提交按钮操作
-    function sss() {
-        var LoginData = $("#form").serializeArray();
-        var LoginPram = {};
+    function submitMsg() {
+        var submitData = $("#form").serializeArray();
+        var submitDataParam = {};
 
-        for (var i = 0; i < LoginData.length; i++) {
-            LoginPram[LoginData[i].name] = LoginData[i]['value'];
+        for(var i =0;i<submitData.length;i++)
+        {
+            submitDataParam[submitData[i].name] = submitData[i]['value'];
         }
-        //todo 修改提交按钮的行为：将数据库中的表头信息更新为输入
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/updateTemplate",
-            contentType: "application/json;charset=UTF-8",
-            data: JSON.stringify(LoginPram),
+            url: "/submit",
+            contentType:"application/json;charset=UTF-8",
+            data: JSON.stringify(submitDataParam),
             success: function (result) {
                 console.log(result);//打印服务端返回的数据(调试用)
                 if (result.code == 200) {
                     alert("提交成功");
+                    //todo 提示是否再添加一条数据，否->跳转到填表历史
                 } else {
                     alert("提交异常");
                 }
@@ -141,20 +144,20 @@
     }
 </script>
 <script>
-    // 获取url中的templateId
-    function getTemplateId() {
+    // 获取url中的excelId
+    function getExcelId() {
         var url = window.location.href;
-        var templateId = url.substring(url.lastIndexOf("/") + 1);
-        if (!(typeof templateId == "undefined" || templateId == null || templateId == "")) {
-            $("#hiddenId").val(templateId);
-            return (templateId);
+        var excelId = url.substring(url.lastIndexOf("/") + 1);
+        if (!(typeof excelId == "undefined" || excelId == null || excelId == "")) {
+            $("#hiddenId").val(excelId);
+            return (excelId);
         }
     }
 
     $(document).ready(function () {
         //dropdown
         $.ajax({
-            type: "POST",
+            type: "GET",
             dataType: "json",
             url: "/user/getName",
             success: function (result) {
@@ -170,12 +173,11 @@
             }
         });
 
-        //获取表格数据
-        templateId = getTemplateId();
+        //获取模板，生成页面
+        excelId = getExcelId();
         $.ajax({
-            url: "/user/template/" + templateId,
+            url: "/user/excel/" + excelId,
             success(result) {
-                console.log(result);
                 if (result.code == "200") {
                     // 请求模板成功，生成前端表单页面
                     var result = result.result;
@@ -184,12 +186,13 @@
                         for (var item in json) {
                             $("#FormBegin")
                                 .append("<div class=\"form-group\">\n" +
-                                    "                            <input type=\"text\" id=\"" + item + "\" name=\"templateId\" value=" + json[item] + ">\n" +
-                                    "                            </div>")
+                                    "        <label>" + json[item] + "</label>\n" +
+                                    "        <input type=\"text\" name=" + item + " placeholder=\"" + json[item] + "\">\n" +
+                                    "    </div>\n")
                         }
                     }
                 } else {
-                    alert("请求模板失败");
+                    alert(result.message);
                 }
             },
             error() {
@@ -201,4 +204,3 @@
 
 </body>
 </html>
-

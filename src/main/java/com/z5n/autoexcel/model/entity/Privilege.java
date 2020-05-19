@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * @program: autoexcel
- * @ClassName: Template
+ * @ClassName: Excel
  * @Description:  创建的excel模板类
  * @Author: chen qi
  * @Date: 2019/12/22 8:32

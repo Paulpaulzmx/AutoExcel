@@ -93,13 +93,12 @@
 <script>window.jQuery || document.write('<script src="/js/jquery-3.4.1.min.js"><\/script>')</script>
 <script src="/js/bootstrap.min.js"></script>
 <script src="/js/fileinput.min.js" type="application/javascript"></script>
-<script src="/js/locales/fa.js" type="application/javascript"></script>
 <script src="/js/locales/zh.js" type="application/javascript"></script>
 
 <script>
     $(document).ready(function () {
         $.ajax({
-            type: "POST",
+            type: "GET",
             dataType: "json",
             url: "/user/getName",
             success: function (result) {
@@ -121,7 +120,7 @@
 <script>
     $("#input-id").fileinput({
         language: "zh",
-        uploadUrl: "../uploadTemplate",
+        uploadUrl: "../uploadExcel",
         uploadExtraData: {},
         allowedFileExtensions: ["xls", "xlsx"],
         showUpload: true,
@@ -131,11 +130,10 @@
         dropZoneTitle: "点击这里上传表格...<br/>或拖拽表格文件到这里...",
         dropZoneClickTitle: "",
     }).on('fileuploaded', function (event, data, previewId, index) {
-        // var form = data.form, files = data.files, reader = data.reader, extra = data.extra,
         var response = data.response;
         if (response.status == "OK") {
             alert("上传成功");
-            window.location.href = "/user/editTemplate/"+response.templateId;
+            window.location.href = "/user/editExcel/"+response.excelId;
         }
     }).on('fileerror', function (event, data, msg) {  //一个文件上传失败
         alert('文件上传失败！' + msg);

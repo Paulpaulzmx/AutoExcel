@@ -2,8 +2,8 @@ package com.z5n.autoexcel.excel;
 
 /**
  * @program: autoexcel
- * @ClassName: TemplateDataListener
- * @Description: TemplateDataListener
+ * @ClassName: ExcelDataListener
+ * @Description: ExcelDataListener
  * @Author: chen qi
  * @Date: 2019/12/22 16:59
  * @Version: 1.0
@@ -20,7 +20,7 @@ import java.util.Map;
 
 
 @Slf4j
-public class TemplateDataListener extends AnalysisEventListener<Map<Integer, String>> {
+public class ExcelDataListener extends AnalysisEventListener<Map<Integer, String>> {
 
     private final List<Map<Integer, String>> headList = new ArrayList<>();
 

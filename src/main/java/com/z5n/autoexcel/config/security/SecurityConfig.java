@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
                 .antMatchers("/user/**").hasRole("USER")
-                .antMatchers("/", "/register/**", "/login","submit").permitAll()
+                .antMatchers("/", "/register/**", "/forgetPassword/**", "/login","submit").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -51,6 +51,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/js/**", "/css/**", "/fonts/**", "/bootstrap4/**");
+        web.ignoring().antMatchers("/js/**", "/css/**","/img/**", "/fonts/**", "/bootstrap4/**");
     }
 }

@@ -29,8 +29,8 @@ import java.util.Optional;
 
 /**
  * @program: autoexcel
- * @ClassName: TemplateServiceImpl
- * @Description: TemplateServiceImpl
+ * @ClassName: ExcelServiceImpl
+ * @Description: ExcelServiceImpl
  * @Author: chen qi
  * @Date: 2019/12/22 19:42
  * @Version: 1.0
@@ -284,6 +284,17 @@ public class UserServiceImpl extends AbstractCurdService<User, String> implement
         catch (Exception e) {
             log.error(e.getMessage());
             return null;
+        }
+    }
+
+    @Override
+    public User updatePassword(User user, String newPassword) {
+        User newUser = user;
+        newUser.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+        try{
+            return userRepository.save(newUser);
+        }catch (Exception e){
+            throw new BusinessException("存储新用户时出错");
         }
     }
 }

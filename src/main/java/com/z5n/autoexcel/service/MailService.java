@@ -1,5 +1,6 @@
 package com.z5n.autoexcel.service;
 
+import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.vo.MailVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,16 +27,16 @@ public class MailService {
     private RedisTemplate redisTemplate;
 
 
-    public MailVo sendMail(MailVo mailVo) {
+    public void sendMail(MailVo mailVo) {
         try {
             checkMail(mailVo);
             sendMimeMail(mailVo);
-            return saveMail(mailVo);
+            saveMail(mailVo);
         } catch (Exception e) {
             log.error("发送邮件失败:", e);
             mailVo.setStatus("fail");
             mailVo.setError(e.getMessage());
-            return mailVo;
+            throw new BusinessException("邮件发送失败");
         }
 
     }

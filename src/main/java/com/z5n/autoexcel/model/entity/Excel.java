@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 /**
  * @program: autoexcel
- * @ClassName: Template
+ * @ClassName: Excel
  * @Description:  创建的excel模板类
  * @Author: chen qi
  * @Date: 2019/12/22 8:32
@@ -17,10 +17,10 @@ import javax.persistence.*;
 
 @Data
 @Entity
-@Table(name = "template")
+@Table(name = "excel")
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Template extends BaseEntity {
+public class Excel extends BaseEntity {
 
     @Id()
     @Column(name = "uuid", length = 32)
@@ -31,6 +31,9 @@ public class Template extends BaseEntity {
 
     @Column(name = "file_name",length = 255, columnDefinition = " not null")
     private String fileName;
+
+    @Column(name = "title", length=255)
+    private String title;
 
     @Column(name = "head_content", columnDefinition = "text not null")
     private String headContent;

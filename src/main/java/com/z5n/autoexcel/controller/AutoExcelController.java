@@ -1,23 +1,36 @@
 package com.z5n.autoexcel.controller;
 
+import com.alibaba.excel.EasyExcel;
 import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.ResultBody;
-import com.z5n.autoexcel.model.entity.StuMsg;
-import com.z5n.autoexcel.model.entity.Template;
-import com.z5n.autoexcel.service.StuMsgService;
-import com.z5n.autoexcel.service.TemplateService;
+import com.z5n.autoexcel.model.entity.SubmitMsg;
+import com.z5n.autoexcel.model.entity.Excel;
+import com.z5n.autoexcel.model.vo.ExcelVo;
+import com.z5n.autoexcel.service.ExcelService;
+import com.z5n.autoexcel.service.SubmitMsgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -29,80 +42,45 @@ import java.util.List;
 @RestController
 public class AutoExcelController {
 
-    private final TemplateService templateService;
-    private final StuMsgService stuMsgService;
-
-    public AutoExcelController(TemplateService templateService, StuMsgService stuMsgService) {
-        this.templateService = templateService;
-        this.stuMsgService = stuMsgService;
-    }
+    private final ExcelService excelService;
+    private final SubmitMsgService submitMsgService;
 
 
-
-
-
-    /**
-     * basis页面请求表头生成填表页面
-     *
-     * @param id 请求的表格id
-     * @return 返回表格id为id的表头
-     */
-    @ApiOperation("页面自动获取表格模板的接口")
-    @ApiImplicitParam(name = "id", required = true, value = "模板id")
-    @RequestMapping(value = "/user/template/{id}", method = RequestMethod.GET)
-    public ResultBody getTemplateById(@PathVariable("id") String id) {
-        if (id == null) {
-            throw new BusinessException("参数不能为空");
-        }
-
-        Template template = templateService.getById(id);
-        return ResultBody.success(template.getHeadContent());
-
-    }
-
-
-    /**
-     * (填表人)提交一条信息
-     *
-     * @param submitMsg json形式的信息
-     * @return 是否成功
-     */
-    @ApiOperation("填表人提交一次信息的接口")
-    @ApiImplicitParam(name = "submitMsg", required = true, value = "json字符串形式，包括模板id和表格具体内容")
-    @RequestMapping(value = "/submit", method = RequestMethod.POST)
-    public ResultBody submit(@RequestBody String submitMsg) {
-        JSONObject jsonObject = JSONObject.parseObject(submitMsg);
-        StuMsg stuMsg = stuMsgService.submitMsg(jsonObject);
-        return ResultBody.success(stuMsg);
+    public AutoExcelController(ExcelService excelService, SubmitMsgService submitMsgService) throws FileNotFoundException {
+        this.excelService = excelService;
+        this.submitMsgService = submitMsgService;
     }
 
 
     /**
      * 获取所有表的统计信息，用于管理员对表执行下一步的操作
+     *
      * @return 返回所有表的统计详情
      */
     @ApiOperation("获取所有表格信息的接口")
-    @RequestMapping(value = "/getAllExcel", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/getAllExcel", method = RequestMethod.GET)
     public ResultBody getAllExcel() {
-        List<Template> excelList = templateService.getExcelList();
-        return ResultBody.success(excelList);
-    }
-
-
-    /**
-     * 收集完成后，请求生成表格
-     *
-     * @param id 请求生成的表格id
-     * @return 返回excel表格
-     */
-    @ApiOperation("请求导出生成表格的接口")
-    @ApiImplicitParam(name = "id", required = true, value = "表格id")
-    @RequestMapping(value = "/downloadExcel/{id}", method = RequestMethod.GET)
-    public ResultBody downloadExcel(@PathVariable("id") String id) {
-        if (id == null) {
-            throw new BusinessException("id不能为空");
+        List<Excel> excelList = excelService.getExcelList();
+        try {
+            List<ExcelVo> excelVoList = new ArrayList<>();
+            int count;
+            String temp;
+            for (Excel excel : excelList) {
+                ExcelVo excelVo = new ExcelVo();
+                count = submitMsgService.countMsgByExcelId(excel.getUuid());
+                excelVo.setSubmitNum(count);
+                excelVo.setUuid(excel.getUuid());
+                excelVo.setFileName(excel.getFileName());
+                excelVo.setHeadContent(excel.getHeadContent());
+                temp = excel.getCreateTime().toString();
+                excelVo.setCreateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                temp = excel.getUpdateTime().toString();
+                excelVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                excelVoList.add(excelVo);
+            }
+            return ResultBody.success(excelVoList);
+        } catch (BusinessException e){
+            return ResultBody.error(e.getMessage());
         }
-        return ResultBody.success(stuMsgService.getMsgByTemplateId(id));
-        // todo 导出整合好数据的excel
     }
 }

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-table.min.css" rel="stylesheet">
+    <link href="/css/register.css" rel="stylesheet">
+
+    <title>表格自动收集系统</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding-top: 70px;
+        }
+
+        .content {
+            flex: 1;
+        }
+    </style>
+
+</head>
+<body>
+<!-- 顶部导航栏 -->
+<div class="nav" role="navigation">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/user/index">表格自动收集系统</a>
+            </div>
+            <div id="navbar" class="collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li><a href="/user/index">上传表格</a></li>
+                    <li><a href="/user/myExcels">我的表格</a></li>
+                    <li><a href="/user/history">填表历史</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a id="dropdown" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                           role="button" aria-haspopup="true" aria-expanded="false">Dropdown
+                            <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">个人信息修改</a></li>
+                            <li><a href="/logout">退出登录</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<!-- 中间的主体部分 -->
+<div class="content">
+    <!--    这里写页面内容   -->
+    <div class="wrapper fadeInDown">
+        <div id="formContent">
+            <!-- nav-pills -->
+            <ul class="nav nav-pills nav-justified">
+                <li class="active"><a href="#form" data-toggle="pill">确认表头字段</a></li>
+            </ul>
+            <div class="tab-content ">
+                <form id="excelForm" class="tab-pane fade in active">
+                    <br/>
+                    <div id="FormBegin">
+                        <div class="form-group">
+                            <input type="hidden" id="hiddenId" name="excelId" value="">
+                        </div>
+                    </div>
+                    <input type="button" onclick="sss()" class="btn btn-lg btn-success"
+                           value="提交">
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+<!-- 底部footer -->
+<div style="
+    min-width: 100%;
+    background-color: #f8f8f8;
+    padding: 15px;">
+    <footer class="text-center text-muted" style="margin-top: auto;margin-bottom: auto">表格自动收集系统</footer>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/jquery-3.4.1.min.js"></script>
+<script src="/js/bootstrap.min.js" type="application/javascript"></script>
+<script>
+
+    //提交按钮操作
+    function sss() {
+        var UpdateData = $("#excelForm").serializeArray();
+        var UpdateExcel = {};
+
+        for (var i = 0; i < UpdateData.length; i++) {
+            UpdateExcel[UpdateData[i].name] = UpdateData[i]['value'];
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/updateExcel",
+            contentType: "application/json;charset=UTF-8",
+            data: JSON.stringify(UpdateExcel),
+            success: function (result) {
+                if (result.code == 200) {
+                    alert("提交成功");
+                    window.location.href = "/user/myExcels";
+                } else {
+                    alert("提交异常");
+                }
+            },
+            error: function () {
+                alert("提交失败！");
+            }
+        });
+
+    }
+</script>
+<script>
+    // 获取url中的excelId
+    function getExcelId() {
+        var url = window.location.href;
+        var excelId = url.substring(url.lastIndexOf("/") + 1);
+        if (!(typeof excelId == "undefined" || excelId == null || excelId == "")) {
+            $("#hiddenId").val(excelId);
+            return (excelId);
+        }
+    }
+
+    $(document).ready(function () {
+        //dropdown
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "/user/getName",
+            success: function (result) {
+                if (result.code == 200) {
+                    $("#dropdown").html(result.result + " <span class=\"caret\"></span>");
+                } else if (result.code == -1) {
+                    alert(result.message);
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                alert("异常！");
+            }
+        });
+
+        //获取表格数据
+        excelId = getExcelId();
+        $.ajax({
+            url: "/user/excel/" + excelId,
+            success(result) {
+                console.log(result);
+                if (result.code == "200") {
+                    // 请求模板成功，生成前端表单页面
+                    var result = result.result;
+                    if (result != null) {
+                        var json = (new Function("return " + result))();
+                        for (var item in json) {
+                            $("#FormBegin") //拼接新字段
+                                .append("<div class=\"form-group\">\n" +
+                                    "<input type=\"text\" id=\"" + item + "\" name=\"" + item + "\" value=" + json[item] + ">\n" +
+                                    "</div>")
+                        }
+                    }
+                } else {
+                    alert("请求模板失败");
+                }
+            },
+            error() {
+                alert("请求失败！");
+            },
+        })
+    })
+</script>
+
+</body>
+</html>
+

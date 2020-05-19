@@ -42,13 +42,13 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="/">表格自动收集系统</a>
+                <a class="navbar-brand" href="/user/index">表格自动收集系统</a>
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a>上传表格</a></li>
-                    <li><a href="/myExcels">我的表格</a></li>
-                    <li><a href="/history">填表历史</a></li>
+                    <li><a href="/user/index">上传表格</a></li>
+                    <li><a href="/user/myExcels">我的表格</a></li>
+                    <li><a href="/user/history">填表历史</a></li>
                 </ul>
             </div>
         </div>
@@ -69,7 +69,7 @@
                         <a href="#person-box" data-toggle="tab">个人登录</a>
                     </li>
                     <li class="">
-                        <a href="#group-box" data-toggle="tab">管理员登录</a>
+                        <a href="#admin-box" data-toggle="tab">管理员登录</a>
                     </li>
                 </ul>
                 <div class="tab-content" style="margin-top: 15px;">
@@ -84,7 +84,8 @@
                         </div>
                         <div class="form-group has-feedback">
                             <label for="password-person">密码</label>
-                            <a class="text-muted small" href="">(忘记密码)</a><!-- todo 忘记密码的页面 -->
+                            <a class="text-muted small" data-toggle="modal"
+                               data-target="#forgetPassword">(忘记密码)</a>
                             <input type="password" class="form-control" id="password-person"
                                    name="password-person" placeholder="请输入密码" tabindex="2">
                             <span class="glyphicon glyphicon-remove form-control-feedback"
@@ -93,22 +94,22 @@
                         <a id="sign-in-btn-person" class="btn btn-md btn-info" tabindex="4"
                            style="display: block">登陆</a>
                     </div>
-                    <div class="tab-pane fade in" id="group-box">
+                    <div class="tab-pane fade in" id="admin-box">
                         <div class="form-group has-feedback">
-                            <label for="username-group">账号</label>
-                            <input type="text" class="form-control" id="username-group"
-                                   name="username-group" placeholder="请输入账号" tabindex="1">
+                            <label for="username-admin">账号</label>
+                            <input type="text" class="form-control" id="username-admin"
+                                   name="username-admin" placeholder="请输入账号" tabindex="1">
                             <span class="glyphicon glyphicon-remove form-control-feedback"
                                   style="display: none;"></span>
                         </div>
                         <div class="form-group has-feedback">
-                            <label for="password-group">密码</label>
-                            <input type="password" class="form-control" id="password-group"
-                                   name="password-group" placeholder="请输入密码" tabindex="2">
+                            <label for="password-admin">密码</label>
+                            <input type="password" class="form-control" id="password-admin"
+                                   name="password-admin" placeholder="请输入密码" tabindex="2">
                             <span class="glyphicon glyphicon-remove form-control-feedback"
                                   style="display: none;"></span>
                         </div>
-                        <a id="sign-in-btn-group" class="btn btn-md btn-info" tabindex="4" style="display: block">登陆</a>
+                        <a id="sign-in-btn-admin" class="btn btn-md btn-info" tabindex="4" style="display: block">登陆</a>
                     </div>
                 </div>
             </div>
@@ -124,6 +125,44 @@
     padding: 15px;">
     <footer class="text-center text-muted" style="margin-top: auto;margin-bottom: auto">表格自动收集系统</footer>
 </div>
+
+<!--忘记密码弹出框-->
+<div class="modal fade" id="forgetPassword" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">请输入用户名</h4>
+            </div>
+            <div class="modal-body">
+                <form id="forgetPasswordInput">
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="username" name="username">
+                    </div>
+                    <div id="verifyCode" class="form-group">
+                        <label>验证码</label>
+                        <input type="text"  name="verifyCode">
+                        <button type="button" class="btn btn-default" onclick="getVerifyCode()">获取验证码</button>
+                    </div>
+                    <div id="newPassword" class="form-group hidden">
+                        <label>新密码</label>
+                        <input type="text"  name="newPassword">
+                    </div>
+                    <div id="newPasswordVerify" class="form-group hidden">
+                        <label>新密码确认</label>
+                        <input type="text"  name="newPasswordVerify">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" onclick="resetPasswordSubmit()" class="btn btn-primary">提交</button>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Bootstrap core JavaScript
 ==================================================
 -- Placed at the end of the document so the pages load faster -->
@@ -133,6 +172,67 @@
 <script src="/js/fileinput.min.js" type="application/javascript"></script>
 <script src="/js/locales/fa.js" type="application/javascript"></script>
 <script src="/js/locales/zh.js" type="application/javascript"></script>
+
+<script>
+    //忘记密码
+    //发送验证码
+    function getVerifyCode() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/forgetPassword/getVerifyCode",
+            data: "username=" + $("#username").val(),
+            success: function (result) {
+                console.log("result:" + result);//打印服务端返回的数据(调试用)
+                if (result.code == 200) {
+                    alert("请查看验证码");
+                    $("#newPassword").removeClass("hidden");
+                    $("#newPasswordVerify").removeClass("hidden");
+                } else if (result.code == -1) {
+                    alert(result.message);
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                alert("异常！");
+            }
+        });
+    }
+
+    //重置密码
+    function resetPasswordSubmit() {
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url: "/forgetPassword/resetPasswordSubmit",
+            data: $('#forgetPasswordInput').serialize(),
+            success: function (result) {
+                console.log("result:" + result);//打印服务端返回的数据(调试用)
+                if (result.code == 200) {
+                    alert("密码重置成功");
+                    window.location.href = "/"
+                } else if (result.code == -1) {
+                    alert(result.message);
+                }
+            },
+            error: function (result) {
+                console.log(result);
+                alert("异常！");
+            }
+        });
+    }
+
+    //忘记密码字段校验
+    $(function () {
+        //检测密码一致
+        $("#newPasswordVerify").blur(function () {
+            if (!$("#newPassword").val() || $("#newPasswordVerify").val() != $("#newPassword").val()) {
+                alert("两次密码不一致!");
+            }
+        });
+    });
+
+</script>
 
 <script>
 
@@ -150,28 +250,20 @@
         });
 
         //回车跳至下一项
-        $("#username-person,#username-group").keyup(function (event) {
+        $("#username-person,#username-admin").keyup(function (event) {
             if (event.keyCode === 13 && this.value) {
                 if (this.id === "username-person")
                     $("#password-person").trigger("focus");
-                if (this.id === "username-group")
-                    $("#password-group").trigger("focus");
+                if (this.id === "username-admin")
+                    $("#password-admin").trigger("focus");
             }
         });
-        $("#password-person,#password-group").keyup(function (event) {
-            if (event.keyCode === 13 && this.value) {
-                if (this.id === "verify-person")
-                    $("#sign-in-btn-person").trigger("click");
-                if (this.id === "verify-group")
-                    $("#sign-in-btn-group").trigger("click");
-            }
-        });
-        $("#sign-in-btn-person,#sign-in-btn-group").keyup(function (event) {
+        $("#sign-in-btn-person,#sign-in-btn-admin").keyup(function (event) {
             if (event.keyCode === 13) {
                 if (this.id === "sign-in-btn-person")
                     $("#sign-in-btn-person").click();
-                if (this.id === "sign-in-btn-group")
-                    $("#sign-in-btn-group").click();
+                if (this.id === "sign-in-btn-admin")
+                    $("#sign-in-btn-admin").click();
             }
         });
 
@@ -228,24 +320,31 @@
             });
         });
 
-        //todo 改成管理员登陆
-        $("#sign-in-btn-group").click(function () {
-            var data = {
-                'username': $("#username-group")._val(),
-                'password': $("#password-group")._val()
-            };
-            if (!(data['username'] && data['password'])) {
+        //管理员登陆按钮
+        $("#sign-in-btn-admin").click(function () {
+            var username =  $("#username-admin")._val();
+            var password =  $("#password-admin")._val();
+
+            if (!(username && password)) {
                 return false;
             }
-            $.post("#", data, function (response) {
-                if (response.status === 200) {
-                    alert(response.message);
-                    location.href = "";  //todo 跳转到用户主页
-                } else {
-                    alert(response.message ? response.message : "操作失败");
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/login",
+                data: "username=" + username + "&password=" + password,
+                success: function (result) {
+                    console.log(result);//打印服务端返回的数据(调试用)
+                    if (result.code == 200) {
+                        window.location.href = "/admin/excels"  //跳至个人主页
+                    } else {
+                        alert(result.message);
+                    }
+                },
+                error: function () {
+                    alert("提交请求失败！");
                 }
-
-            })
+            });
         });
 
     });

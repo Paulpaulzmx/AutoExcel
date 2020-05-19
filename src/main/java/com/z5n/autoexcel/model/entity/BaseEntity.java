@@ -1,6 +1,6 @@
 package com.z5n.autoexcel.model.entity;
 
-import com.z5n.autoexcel.utils.DateUtils;
+import com.z5n.autoexcel.utils.DateAndTimeUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -45,7 +45,7 @@ public class BaseEntity {
     @PrePersist
     protected void prePersist() {
         deleted = false;
-        Date now = DateUtils.now();
+        Date now = DateAndTimeUtils.now();
         if (createTime == null) {
             createTime = now;
         }

@@ -1,6 +1,6 @@
 package com.z5n.autoexcel.controller;
 
-import com.z5n.autoexcel.service.StuMsgService;
+import com.z5n.autoexcel.service.SubmitMsgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @Controller
 public class PageController {
 
-    private final StuMsgService stuMsgService;
+    private final SubmitMsgService submitMsgService;
 
-    public PageController(StuMsgService stuMsgService) {
-        this.stuMsgService = stuMsgService;
+    public PageController(SubmitMsgService submitMsgService) {
+        this.submitMsgService = submitMsgService;
     }
 
 
@@ -30,19 +30,18 @@ public class PageController {
      * @return 主页
      */
     @ApiOperation("填表人获取填写表单的接口")
-    @RequestMapping(value = "/goBasis/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/user/inputMsg/{id}", method = RequestMethod.GET)
     public String index(){
-        return "basis";
+        return "input";
     }
-    //zmxtodo 重命名函数名
 
     /**
      * 请求excel纵览页面
      */
     @ApiOperation("管理员查看所有表格纵览的接口")
-    @RequestMapping(value = "/excels", method = RequestMethod.GET)
+    @RequestMapping(value = "/admin/excels", method = RequestMethod.GET)
     public String excels(){
-        return "excels";
+        return "admin/excels";
     }
 
     /**
@@ -59,8 +58,6 @@ public class PageController {
     public String indexPage(){
         return "index";
     }
-
-
 
     @ApiOperation("注册账号")
     @RequestMapping(value = "/register", method = RequestMethod.GET)
@@ -86,10 +83,10 @@ public class PageController {
         return "user/myExcels";
     }
 
-    @ApiOperation("我的模板")
-    @RequestMapping(value = "/user/editTemplate/{id}", method = RequestMethod.GET)
-    public String editTemplate5(){
-        return "user/editTemplate";
+    @ApiOperation("编辑模板")
+    @RequestMapping(value = "/user/editExcel/{id}", method = RequestMethod.GET)
+    public String editTemplate(){
+        return "user/editExcel";
     }
 
     @ApiOperation("测试用")

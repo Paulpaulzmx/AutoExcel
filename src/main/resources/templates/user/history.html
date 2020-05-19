@@ -56,8 +56,8 @@
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li><a href="/user/index">上传表格</a></li>
-                    <li class="active"><a>我的表格</a></li>
-                    <li><a href="/user/history">填表历史</a></li>
+                    <li><a href="/user/myExcels">我的表格</a></li>
+                    <li class="active"><a>填表历史</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
@@ -78,7 +78,7 @@
 <!-- 中间的主体部分 -->
 <div class="content">
     <!--    这里写页面内容   -->
-    <div class="fresh-table full-color-green full-screen-table">
+    <div class="fresh-table full-color-orange full-screen-table">
         <table id="table"></table>
     </div>
 </div>
@@ -179,7 +179,7 @@
         });
 
         $.ajax({
-            url: '/user/getMyExcel',
+            url: '/user/getMySubmit',
             success(result) {
                 if (result.code == 200) {
                     var data = result.result;
@@ -207,22 +207,17 @@
                             },
                             {
                                 sortable: true,
-                                field: 'headContent',
+                                field: 'title',
+                                title: '标题'
+                            },
+                            {
+                                sortable: true,
+                                field: 'head',
                                 title: '表头信息'
                             },
                             {
                                 sortable: true,
-                                field: 'submitNum',
-                                title: '已提交'
-                            },
-                            {
-                                sortable: true,
                                 field: 'updateTimeStr',
-                                title: '最后更新时间'
-                            },
-                            {
-                                sortable: true,
-                                field: 'createTimeStr',
                                 title: '提交时间'
                             },
                             {
@@ -239,11 +234,9 @@
                 } else {
                     alert(result.message)
                 }
-
-
             },
-            error(errorMsg) {
-                alert(errorMsg);
+            error() {
+                alert("请求错误");
             }
         })
 

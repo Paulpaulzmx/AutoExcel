@@ -6,6 +6,7 @@ import com.z5n.autoexcel.model.ResultBody;
 import com.z5n.autoexcel.model.entity.User;
 import com.z5n.autoexcel.model.entity.UserInfo;
 import com.z5n.autoexcel.model.vo.MailVo;
+import com.z5n.autoexcel.model.vo.ResetPasswordVO;
 import com.z5n.autoexcel.model.vo.UserRegisterVo;
 import com.z5n.autoexcel.service.MailService;
 import com.z5n.autoexcel.service.UserService;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.Date;
 
 @Slf4j
@@ -42,6 +42,10 @@ public class UserController {
         this.authenticationFacade = authenticationFacade;
     }
 
+    /**用户登陆接口
+     * @param username 用户名
+     * @param password 密码
+     */
     @ApiOperation("用户登陆接口")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResultBody login(String username, String password){
@@ -60,6 +64,9 @@ public class UserController {
         }
     }
 
+    /**新用户注册接口
+     * @param userRegisterVo 新用户注册信息
+     */
     @ApiOperation("新用户注册接口")
     @RequestMapping(value = "/register/newUser", method = RequestMethod.POST)
     public ResultBody userRegister(UserRegisterVo userRegisterVo) {
@@ -117,13 +124,78 @@ public class UserController {
         return ResultBody.success();
     }
 
+    /**邮箱验证码发送
+     * @param emailAddress 邮箱地址
+     */
     @ApiOperation("邮箱验证码发送")
     @RequestMapping(value = "/register/verifyCode", method = RequestMethod.POST)
     public ResultBody emailVerify(@RequestParam("emailAddress") String emailAddress) {
         //生成验证码
+        try {
+            sendVerifyCode(emailAddress);
+            return ResultBody.success();
+        }catch (BusinessException e){
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+    /**获取用户名
+     * @return 当前登陆用户的用户名
+     */
+    @RequestMapping(value = "/user/getName", method = RequestMethod.GET)
+    public ResultBody showUsername(){
+        Authentication authentication = authenticationFacade.getAuthentication();
+        return ResultBody.success(authentication.getName());
+    }
+
+    /**忘记密码发送验证码
+     * @param username 需要重置密码的用户名
+     */
+    @RequestMapping(value = "/forgetPassword/getVerifyCode", method = RequestMethod.POST)
+    public ResultBody forgetPasswordVerifyCode(@RequestParam("username") String username){
+        try{
+            User user = userService.findUserByUsername(username);
+            if(user == null){
+                return ResultBody.error("用户："+username+"不存在！");
+            }
+            sendVerifyCode(user.getEmail());
+            return ResultBody.success();
+        }catch (BusinessException e){
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "forgetPassword/resetPasswordSubmit", method = RequestMethod.POST)
+    public ResultBody resetPassword(ResetPasswordVO resetPasswordVO){
+        if(
+                StringUtils.isEmpty(resetPasswordVO.getUsername()) ||
+                StringUtils.isEmpty(resetPasswordVO.getVerifyCode()) ||
+                StringUtils.isEmpty(resetPasswordVO.getNewPassword()) ||
+                StringUtils.isEmpty(resetPasswordVO.getNewPasswordVerify())
+        ){
+            return ResultBody.error("参数错误");
+        }
+        if(!resetPasswordVO.getNewPasswordVerify().equals(resetPasswordVO.getNewPassword())){
+            return ResultBody.error("两次密码不同");
+        }
+
+        User user = userService.findUserByUsername(resetPasswordVO.getUsername());
+        if(!mailService.verifying(user.getEmail(), resetPasswordVO.getVerifyCode())){
+            return ResultBody.error("验证码错误，请重试！");
+        }
+        try{
+            userService.updatePassword(user, resetPasswordVO.getNewPassword());
+            return ResultBody.success();
+        }catch(BusinessException e){
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+    /**发送验证码
+     * @param emailAddress
+     */
+    private void sendVerifyCode(@RequestParam("emailAddress") String emailAddress) {
         String verifyCode = VerifyCodeUtils.generateVerifyCode();
-        log.debug("生成验证码："+ verifyCode);
-        System.out.println(emailAddress);
         MailVo mailVo = new MailVo();
         mailVo.setFrom("980455605@qq.com");
         mailVo.setTo(emailAddress);
@@ -132,12 +204,5 @@ public class UserController {
         mailVo.setVerifyCode(verifyCode);
         mailVo.setText("验证码为：" + mailVo.getVerifyCode());
         mailService.sendMail(mailVo);
-        return ResultBody.success();
-    }
-
-    @RequestMapping(value = "/user/getName", method = RequestMethod.POST)
-    public ResultBody showUsername(){
-        Authentication authentication = authenticationFacade.getAuthentication();
-        return ResultBody.success(authentication.getName());
     }
 }
