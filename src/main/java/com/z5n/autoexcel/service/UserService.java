@@ -18,4 +18,5 @@ public interface UserService extends CurdService<User, String>, UserDetailsServi
     UserInfo addUserInfo(UserInfo userInfo, String userId);
     User findUserByUsername(String username);
     User updatePassword(User user, String newPassword);
+    User findUserById(String id);
 }

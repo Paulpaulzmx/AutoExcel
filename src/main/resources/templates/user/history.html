@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--    <link href="/bootstrap4/css/bootstrap.min.css" rel="stylesheet">-->
     <link href="/css/bootstrap.min.css" rel="stylesheet">
     <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/css/bootstrap-table.min.css" rel="stylesheet">
@@ -12,11 +11,9 @@
 
     <!-- Style -->
     <link href="/css/fresh-bootstrap-table.css" rel="stylesheet"/>
-    <!--    <link rel="stylesheet" href="../../static/css/fresh-bootstrap-table.css">-->
 
     <!-- Fonts and icons -->
     <link href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" rel="stylesheet">
-    <link href="http://fonts.googleapis.com/css?family=Roboto:400,700,300" rel="stylesheet" type="text/css">
 
     <title>表格自动收集系统</title>
 
@@ -66,7 +63,7 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">个人信息修改</a></li>
+                            <li><a href="/user/editPersonInfo">个人信息修改</a></li>
                             <li><a href="/logout">退出登录</a></li>
                         </ul>
                     </li>
@@ -102,33 +99,21 @@
 <script>
     function operateFormatter(value, row, index) {
         return [
-            '<a class="edit" href="javascript:void(0)" title="编辑">',
-            '<i class="fa fa-edit"/>',
-            '</a>  ',
             '<a class="remove" href="javascript:void(0)" title="删除">',
             '<i class="fa fa-trash"/>',
-            '</a>',
-            '<a class="link" href="javascript:void(0)" title="获取链接">',
-            '<i class="fa fa-link"/>',
-            '</a>',
-            '<a class="export" href="javascript:void(0)" title="导出">',
-            '<i class="fa fa-download"/>',
             '</a>',
         ].join('')
     }
 
     window.operateEvents = {
-        'click .edit': function (e, value, row, index) {
-            window.location.href = "/user/editExcel/" + row.uuid;
-        },
         'click .remove': function (e, value, row, index) {
             //发出删除操作api
             if (confirm("确认删除？")) {
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: "/user/deleteExcel",
-                    data: "excelId=" + row.uuid,
+                    url: "/user/deleteSubmitMsg",
+                    data: "submitMsgId=" + row.uuid,
                     success: function (result) {
                         if (result.code == 200) {
                             //可以改为重新请求一次数据
@@ -141,7 +126,6 @@
                         }
                     },
                     error: function (result) {
-                        console.log(result);
                         alert("请求异常！");
                     }
                 });
@@ -149,13 +133,6 @@
                 //do nothing
             }
         },
-        'click .link': function (e, value, row, index) {
-            window.location.href = "/user/inputMsg/" + row.uuid;
-        },
-        'click .export':function (e, value, row, index) {
-            window.location.href = "/user/downloadExcel/" + row.uuid;
-        }
-
     }
 </script>
 
@@ -186,7 +163,6 @@
                     // 通过js控制表格行为
                     $('#table').bootstrapTable({
                         data: data,
-                        pangination: true,
                         search: true,
                         classes: 'table table-hover table-striped',
                         toolbar: '.toolbar',

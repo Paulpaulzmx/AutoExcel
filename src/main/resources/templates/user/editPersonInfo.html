@@ -74,16 +74,52 @@
         <div id="formContent">
             <!-- nav-pills -->
             <ul class="nav nav-pills nav-justified">
-                <li class="active"><a href="#form" data-toggle="pill">确认表头字段</a></li>
+                <li class="active"><a href="#form" data-toggle="pill">个人信息修改</a></li>
             </ul>
             <div class="tab-content ">
-                <form id="excelForm" class="tab-pane fade in active">
+                <form id="userInfoForm" class="tab-pane fade in active">
                     <br/>
-                    <div id="FormBegin">
+                    <h2>个人信息修改，用于快速填表</h2>
                         <div class="form-group">
-                            <input type="hidden" id="hiddenId" name="excelId" value="">
+                            <input type="hidden" id="hiddenId" name="userId" value="">
                         </div>
-                    </div>
+
+                        <div class="form-group">
+                            <label>真实姓名</label>
+                            <input type="text" id="name" name="trueName" placeholder="姓名">
+                        </div>
+                        <div class="form-group" id="gender" style="display: flex;">
+                            <label style="margin-left: 16px;">性别</label>
+                            <div style="margin-left: 30px;">
+                                <input type="radio" name="gender" value="male">男
+                                <input type="radio" name="gender" value="female">女
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>学号</label>
+                            <input type="text" id="stuNum" name="stuNum" placeholder="学号">
+                        </div>
+                        <div class="form-group">
+                            <label>班级</label>
+                            <input type="text" id="classNum" name="classNum" placeholder="班级">
+                        </div>
+                        <div class="form-group">
+                            <label>身份证号</label>
+                            <input type="text" id="idCardNum" name="idCardNum" placeholder="身份证号">
+                        </div>
+                        <div class="form-group">
+                            <label>手机号</label>
+                            <input type="text" id="tel" name="tel" placeholder="手机号码">
+                        </div>
+                        <div class="form-group">
+                            <label>qq</label>
+                            <input type="text" id="qq" name="qq" placeholder="qq">
+                        </div>
+                        <div class="form-group">
+                            <label>家庭住址</label>
+                            <input type="text" id="address" name="address" placeholder="家庭住址">
+                        </div>
+
                     <input type="button" onclick="sss()" class="btn btn-lg btn-success"
                            value="提交">
                 </form>
@@ -112,22 +148,21 @@
 
     //提交按钮操作
     function sss() {
-        var UpdateData = $("#excelForm").serializeArray();
-        var UpdateExcel = {};
-
-        for (var i = 0; i < UpdateData.length; i++) {
-            UpdateExcel[UpdateData[i].name] = UpdateData[i]['value'];
-        }
+        // var UpdateData = $("#userInfoForm").serializeArray();
+        // var UpdatedUserInfo = {};
+        //
+        // for (var i = 0; i < UpdateData.length; i++) {
+        //     UpdatedUserInfo[UpdateData[i].name] = UpdateData[i]['value'];
+        // }
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/updateExcel",
-            contentType: "application/json;charset=UTF-8",
-            data: JSON.stringify(UpdateExcel),
+            url: "/user/submitNewUserInfo",
+            data: $("#userInfoForm").serializeArray(),
             success: function (result) {
                 if (result.code == 200) {
                     alert("提交成功");
-                    window.location.href = "/user/myExcels";
+                    window.location.href = "/user/index";
                 } else {
                     alert("提交异常");
                 }
@@ -140,16 +175,6 @@
     }
 </script>
 <script>
-    // 获取url中的excelId
-    function getExcelId() {
-        var url = window.location.href;
-        var excelId = url.substring(url.lastIndexOf("/") + 1);
-        if (!(typeof excelId == "undefined" || excelId == null || excelId == "")) {
-            $("#hiddenId").val(excelId);
-            return (excelId);
-        }
-    }
-
     $(document).ready(function () {
         //dropdown
         $.ajax({
@@ -170,21 +195,25 @@
         });
 
         //获取表格数据
-        excelId = getExcelId();
         $.ajax({
-            url: "/user/excel/" + excelId,
+            url: "/user/getOldPersonInfo",
             success(result) {
                 console.log(result);
                 if (result.code == "200") {
                     // 请求模板成功，生成前端表单页面
                     var result = result.result;
                     if (result != null) {
-                        var json = (new Function("return " + result))();
-                        for (var item in json) {
-                            $("#FormBegin") //拼接新字段
-                                .append("<div class=\"form-group\">\n" +
-                                    "<input type=\"text\" id=\"" + item + "\" name=\"" + item + "\" value=" + json[item] + ">\n" +
-                                    "</div>")
+                        $("#stuNum").val(result.stuNum);
+                        $("#classNum").val(result.classNum);
+                        $("#name").val(result.name);
+                        $("#idCardNum").val(result.idNum);
+                        $("#tel").val(result.tel);
+                        $("#qq").val(result.qq);
+                        $("#address").val(result.address);
+                        if(result.gender==1){
+                            $("input[name='gender']").get(0).checked=true;
+                        }else if(result.gender==0){
+                            $("input[name='gender']").get(1).checked=true;
                         }
                     }
                 } else {

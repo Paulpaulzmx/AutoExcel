@@ -21,5 +21,9 @@ public interface SubmitMsgService extends CurdService<SubmitMsg, String> {
 
     public List<SubmitMsg> getValidSubmitMsgByFillerIdSortByUpdateTimeDesc(String userID);
 
+    public List<SubmitMsg> getAllValidSubmitMsgSortByUpdatetimeDesc();
+
     public int countMsgByExcelId(String excelId);
+
+    public boolean checkIsSubmitted(String userId, String excelId);
 }

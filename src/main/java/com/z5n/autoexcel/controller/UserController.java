@@ -1,5 +1,6 @@
 package com.z5n.autoexcel.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.config.security.IAuthenticationFacade;
 import com.z5n.autoexcel.exception.BusinessException;
 import com.z5n.autoexcel.model.ResultBody;
@@ -7,8 +8,10 @@ import com.z5n.autoexcel.model.entity.User;
 import com.z5n.autoexcel.model.entity.UserInfo;
 import com.z5n.autoexcel.model.vo.MailVo;
 import com.z5n.autoexcel.model.vo.ResetPasswordVO;
+import com.z5n.autoexcel.model.vo.UpdateUserInfoVo;
 import com.z5n.autoexcel.model.vo.UserRegisterVo;
 import com.z5n.autoexcel.service.MailService;
+import com.z5n.autoexcel.service.UserInfoService;
 import com.z5n.autoexcel.service.UserService;
 import com.z5n.autoexcel.utils.VerifyCodeUtils;
 import io.swagger.annotations.Api;
@@ -32,13 +35,15 @@ public class UserController {
 
     private final UserService userService;
     private final MailService mailService;
+    private final UserInfoService userInfoService;
 
     private final IAuthenticationFacade authenticationFacade;
 
 
-    public UserController(UserService userService, MailService mailService, IAuthenticationFacade authenticationFacade) {
+    public UserController(UserService userService, MailService mailService, UserInfoService userInfoService, IAuthenticationFacade authenticationFacade) {
         this.userService = userService;
         this.mailService = mailService;
+        this.userInfoService = userInfoService;
         this.authenticationFacade = authenticationFacade;
     }
 
@@ -61,6 +66,49 @@ public class UserController {
             }
         }catch (BusinessException businessException){
             return ResultBody.error(businessException.getMessage());
+        }
+    }
+
+    /**返回用户当前还未修改的附加信息
+     */
+    @ApiOperation("返回用户当前还未修改的附加信息")
+    @RequestMapping(value = "/user/getOldPersonInfo", method = RequestMethod.GET)
+    public ResultBody getOldPersonInfo(){
+        try {
+            Authentication authentication = authenticationFacade.getAuthentication();
+            User currentUser = userService.findUserByUsername(authentication.getName());
+            UserInfo userInfo = userInfoService.getUserInfoByUserId(currentUser.getUuid());
+            return ResultBody.success(userInfo);
+        }catch (BusinessException e){
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+    /**用户提交修改后的新附加信息
+     */
+    @ApiOperation("用户提交修改后的新附加信息")
+    @RequestMapping(value = "/user/submitNewUserInfo", method = RequestMethod.POST)
+    public ResultBody uploadNewUserInfo(UpdateUserInfoVo newUserInfo){
+        try {
+            Authentication authentication = authenticationFacade.getAuthentication();
+            User currentUser = userService.findUserByUsername(authentication.getName());
+            UserInfo userInfo = userInfoService.getUserInfoByUserId(currentUser.getUuid());
+            userInfo.setAddress(newUserInfo.getAddress());
+            userInfo.setClassNum(newUserInfo.getClassNum());
+            userInfo.setQq(newUserInfo.getQq());
+            userInfo.setTel(newUserInfo.getTel());
+            userInfo.setIdNum(newUserInfo.getIdCardNum());
+            userInfo.setStuNum(newUserInfo.getStuNum());
+            if(newUserInfo.getGender() != null && newUserInfo.getGender().equals("male")){
+                userInfo.setGender(1);
+            }else{
+                userInfo.setGender(0);
+            }
+            userInfo.setName(newUserInfo.getTrueName());
+            userInfoService.update(userInfo);
+            return ResultBody.success();
+        }catch (BusinessException e){
+            return ResultBody.error(e.getMessage());
         }
     }
 
@@ -103,6 +151,8 @@ public class UserController {
                 StringUtils.isNotEmpty(userRegisterVo.getIdCardNum()) ||
                 StringUtils.isNotEmpty(userRegisterVo.getTel()) ||
                 StringUtils.isNotEmpty(userRegisterVo.getQq()) ||
+                StringUtils.isNotEmpty(userRegisterVo.getQq()) ||
+                StringUtils.isNotEmpty(userRegisterVo.getClassNum()) ||
                 StringUtils.isNotEmpty(userRegisterVo.getAddress())
         ){
             UserInfo userInfo = new UserInfo();
@@ -117,6 +167,7 @@ public class UserController {
             userInfo.setTel(userRegisterVo.getTel());
             userInfo.setQq(userRegisterVo.getQq());
             userInfo.setAddress(userRegisterVo.getAddress());
+            userInfo.setClassNum(userRegisterVo.getClassNum());
             userService.addUserInfo(userInfo, user.getUuid());
         }else {
             userService.addUserInfo(new UserInfo(), user.getUuid());
@@ -142,6 +193,7 @@ public class UserController {
     /**获取用户名
      * @return 当前登陆用户的用户名
      */
+    @ApiOperation("获取当前用户用户名，显示在dropDown")
     @RequestMapping(value = "/user/getName", method = RequestMethod.GET)
     public ResultBody showUsername(){
         Authentication authentication = authenticationFacade.getAuthentication();
@@ -151,6 +203,7 @@ public class UserController {
     /**忘记密码发送验证码
      * @param username 需要重置密码的用户名
      */
+    @ApiOperation("忘记密码请求发送验证码")
     @RequestMapping(value = "/forgetPassword/getVerifyCode", method = RequestMethod.POST)
     public ResultBody forgetPasswordVerifyCode(@RequestParam("username") String username){
         try{
@@ -165,6 +218,10 @@ public class UserController {
         }
     }
 
+    /**忘记密码提交新密码
+     * @param resetPasswordVO 新密码等信息
+     */
+    @ApiOperation("忘记密码，重置密码请求")
     @RequestMapping(value = "forgetPassword/resetPasswordSubmit", method = RequestMethod.POST)
     public ResultBody resetPassword(ResetPasswordVO resetPasswordVO){
         if(
@@ -194,6 +251,7 @@ public class UserController {
     /**发送验证码
      * @param emailAddress
      */
+    @ApiOperation("发送注册验证码")
     private void sendVerifyCode(@RequestParam("emailAddress") String emailAddress) {
         String verifyCode = VerifyCodeUtils.generateVerifyCode();
         MailVo mailVo = new MailVo();

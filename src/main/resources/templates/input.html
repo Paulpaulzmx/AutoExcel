@@ -9,7 +9,7 @@
     <link href="/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/css/register.css" rel="stylesheet">
 
-    <title>xx信息统计</title>
+    <title>表格自动收集系统</title>
 
     <style>
         html {
@@ -57,7 +57,7 @@
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a href="#">个人信息修改</a></li>
+                            <li><a href="/user/editPersonInfo">个人信息修改</a></li>
                             <li><a href="/logout">退出登录</a></li>
                         </ul>
                     </li>
@@ -131,9 +131,8 @@
                 console.log(result);//打印服务端返回的数据(调试用)
                 if (result.code == 200) {
                     alert("提交成功");
-                    //todo 提示是否再添加一条数据，否->跳转到填表历史
                 } else {
-                    alert("提交异常");
+                    alert(result.message);
                 }
             },
             error: function () {
@@ -187,9 +186,47 @@
                             $("#FormBegin")
                                 .append("<div class=\"form-group\">\n" +
                                     "        <label>" + json[item] + "</label>\n" +
-                                    "        <input type=\"text\" name=" + item + " placeholder=\"" + json[item] + "\">\n" +
+                                    "        <input type=\"text\" name=" + item + " id=" + json[item] + " placeholder=\"" + json[item] + "\">\n" +
                                     "    </div>\n")
                         }
+                        //自动填充用户附加数据
+                        $.ajax({
+                            url: "/user/personalInfo/",
+                            success(result) {
+                                if (result.code == "200") {
+                                    // 请求模板成功，生成前端表单页面
+                                    var result = result.result;
+                                    if (result != null) {
+                                        console.log(result);
+                                        $("#地址").val(result.address);
+                                        $("#家庭住址").val(result.address);
+                                        $("#所在地").val(result.address);
+                                        if(result.gender){
+                                            $("#性别").val("女");
+                                        }else{
+                                            $("#性别").val("男");
+                                        }
+                                        $("#姓名").val(result.name);
+                                        $("#电话").val(result.tel);
+                                        $("#手机号").val(result.tel);
+                                        $("#班级").val(result.classNum);
+                                        $("#qq").val(result.qq);
+                                        $("#QQ").val(result.qq);
+                                        $("#身份证号").val(result.idNum);
+                                        $("#身份证").val(result.idNum);
+                                        $("#学号").val(result.stuNum);
+                                        $("#QQ").val(result.qq);
+                                        $("#QQ").val(result.qq);
+                                    }
+                                } else {
+                                    alert(result.message);
+                                }
+                            },
+                            error() {
+                                alert("请求失败！");
+                            },
+                        })
+
                     }
                 } else {
                     alert(result.message);

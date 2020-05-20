@@ -5,18 +5,13 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class UserRegisterVo {
-    private String username;
-    private String password;
-    private String passwordVerify;
-    private String email;
+public class UpdateUserInfoVo{
     private String trueName;
     private String gender;
     private String stuNum;
+    private String classNum;
     private String idCardNum;
     private String tel;
     private String qq;
     private String address;
-    private String verifyCode;
-    private String classNum;
 }

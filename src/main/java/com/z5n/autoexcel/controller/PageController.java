@@ -44,6 +44,16 @@ public class PageController {
         return "admin/excels";
     }
 
+
+    /**
+     * 管理员请求全部提交历史
+     */
+    @ApiOperation("管理员查看所有表格纵览的接口")
+    @RequestMapping(value = "/admin/history", method = RequestMethod.GET)
+    public String history(){
+        return "admin/history";
+    }
+
     /**
      * 请求上传页面
      */
@@ -89,10 +99,10 @@ public class PageController {
         return "user/editExcel";
     }
 
-    @ApiOperation("测试用")
-    @RequestMapping(value = "/submit", method = RequestMethod.GET)
-    public String test(){
-        return "submit";
+    @ApiOperation("个人信息修改")
+    @RequestMapping(value = "/user/editPersonInfo", method = RequestMethod.GET)
+    public String editPersonInfo(){
+        return "user/editPersonInfo";
     }
 
 

@@ -25,6 +25,9 @@ public class UserInfo extends BaseEntity{
     @Column(name = "name")
     private String name;
 
+    @Column(name = "class_num")
+    private String classNum;
+
     @Column(name = "gender")
     private Integer gender;
 

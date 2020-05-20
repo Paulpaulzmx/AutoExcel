@@ -2,6 +2,7 @@ package com.z5n.autoexcel.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.z5n.autoexcel.exception.BusinessException;
+import com.z5n.autoexcel.model.entity.Excel;
 import com.z5n.autoexcel.model.entity.SubmitMsg;
 import com.z5n.autoexcel.repository.SubmitMsgRepository;
 import com.z5n.autoexcel.service.SubmitMsgService;
@@ -27,8 +28,6 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
 
     private final SubmitMsgRepository submitMsgRepository;
 
-
-
     public SubmitMsgServiceImpl(SubmitMsgRepository submitMsgRepository) {
         super(submitMsgRepository);
         this.submitMsgRepository = submitMsgRepository;
@@ -36,10 +35,8 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
 
     /**
      * 处理提交的信息，根据excelId存入数据库
-     *
-     *
-     * @param fillerId
-     * @param jsonObject
+     * @param fillerId      填表人id
+     * @param jsonObject    提交的填写内容
      * @return 返回新增的SubmitMsg实体
      * @author zhou mingxin
      */
@@ -58,6 +55,16 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
             throw new BusinessException(e.getMessage());
         }
 
+    }
+
+    /**为限制每个用户在每个表只能提交一次数据，查询是否已提交过
+     * @param userId    用户id
+     * @param excelId   表格id
+     */
+    public boolean checkIsSubmitted(String userId, String excelId){
+        List<SubmitMsg> submittedUsers = submitMsgRepository
+                .findByFillerIdAndExcelIdAndDeleted(userId, excelId, false);
+        return (submittedUsers.size() != 0);
     }
 
     /**
@@ -88,11 +95,34 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
     }
 
     @Override
+    public List<SubmitMsg> getAllValidSubmitMsgSortByUpdatetimeDesc() {
+        try {
+            Sort sortByUpdateTimeDesc = Sort.by(Sort.Direction.DESC, "updateTime");
+            List<SubmitMsg> submitMsgs = submitMsgRepository.findAllByDeleted(false, sortByUpdateTimeDesc);
+            return submitMsgs;
+        }catch (Exception e){
+            log.error(e.getMessage());
+            throw new BusinessException("查询数据库出错！");
+        }
+    }
+
+    @Override
     public int countMsgByExcelId(String excelId) {
         try {
             return submitMsgRepository.countAllByExcelIdAndDeleted(excelId, false);
         }catch (Exception e){
             throw new BusinessException("请求单表已提交的数据出错！");
+        }
+    }
+
+    @Override
+    public SubmitMsg removeById(String submitMsgId) {
+        try {
+            SubmitMsg submitMsg = submitMsgRepository.findByUuid(submitMsgId);
+            submitMsg.setDeleted(true);
+            return submitMsgRepository.save(submitMsg);
+        }catch (Exception e){
+            throw new BusinessException("删除出错");
         }
     }
 }

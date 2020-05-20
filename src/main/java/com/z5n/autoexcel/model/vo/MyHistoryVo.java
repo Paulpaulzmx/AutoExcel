@@ -8,6 +8,7 @@ import lombok.ToString;
 @ToString
 public class MyHistoryVo extends SubmitMsg {
 
+    private String fillerName;
     private String fileName;
     private String title;
     private String head;

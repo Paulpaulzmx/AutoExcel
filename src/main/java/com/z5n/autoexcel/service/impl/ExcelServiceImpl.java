@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,7 +72,22 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
             throw new BusinessException("读取数据为空");
         }
 
-        Map<Integer, String> map = headList.get(1);
+        Map<Integer, String> map;
+        switch (headList.size()) {
+            case 1:
+                map = headList.get(0);
+                break;
+            case 2:
+            case 3:
+                if (headList.get(0).size() != 1) {
+                    map = headList.get(0);
+                } else {
+                    map = headList.get(1);
+                }
+                break;
+            default:
+                throw new BusinessException("表头格式不符合出错");
+        }
         if (CollectionUtils.isEmpty(map)) {
             throw new BusinessException("读取表头数据为空");
         }
@@ -81,7 +97,7 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
         excel.setTitle(title);
         excel.setHeadContent(JSON.toJSONString(map));
         excel.setUploaderId(uploaderId);
-        excel.setFileName(origName.substring(0,origName.lastIndexOf(".")));
+        excel.setFileName(origName.substring(0, origName.lastIndexOf(".")));
         return excelRepository.save(excel);
     }
 
@@ -90,7 +106,7 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
         try {
             Sort sortByCreateTimeDesc = Sort.by(Sort.Direction.DESC, "createTime");
             return excelRepository.findAll(sortByCreateTimeDesc);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new BusinessException("降序查询全部excel出错");
         }
@@ -98,10 +114,10 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
 
     @Override
     public List<Excel> getExcelListByUploaderIdSortByCreateTimeDesc(String uploaderId) {
-        try{
+        try {
             Sort sortByCreateTimeDesc = Sort.by(Sort.Direction.DESC, "createTime");
             return excelRepository.findAllByUploaderIdAndDeleted(uploaderId, false, sortByCreateTimeDesc);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e.getMessage());
             throw new BusinessException("根据上传者id降序查询excel出错");
         }
@@ -110,9 +126,9 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
     @Override
     public Excel updateExcel(String excelId, String newExcel) {
         Excel excel = excelRepository.findByUuid(excelId);
-        if(excel == null){
+        if (excel == null) {
             throw new BusinessException("excelId错误");
-        }else{
+        } else {
             excel.setHeadContent(newExcel);
             Excel save = excelRepository.save(excel);
             return save;
@@ -125,7 +141,7 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
             Excel excel = excelRepository.findByUuid(excelId);
             excel.setDeleted(true);
             return excelRepository.save(excel);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BusinessException("删除出错");
         }
     }

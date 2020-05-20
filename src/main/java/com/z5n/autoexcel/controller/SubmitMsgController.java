@@ -7,9 +7,11 @@ import com.z5n.autoexcel.model.ResultBody;
 import com.z5n.autoexcel.model.entity.Excel;
 import com.z5n.autoexcel.model.entity.SubmitMsg;
 import com.z5n.autoexcel.model.entity.User;
+import com.z5n.autoexcel.model.entity.UserInfo;
 import com.z5n.autoexcel.model.vo.MyHistoryVo;
 import com.z5n.autoexcel.service.ExcelService;
 import com.z5n.autoexcel.service.SubmitMsgService;
+import com.z5n.autoexcel.service.UserInfoService;
 import com.z5n.autoexcel.service.UserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -32,13 +35,15 @@ public class SubmitMsgController {
     private final ExcelService excelService;
     private final SubmitMsgService submitMsgService;
     private final UserService userService;
+    private final UserInfoService userInfoService;
     private final IAuthenticationFacade authenticationFacade;
 
 
-    public SubmitMsgController(ExcelService excelService, SubmitMsgService submitMsgService, UserService userService, IAuthenticationFacade authenticationFacade) {
+    public SubmitMsgController(ExcelService excelService, SubmitMsgService submitMsgService, UserService userService, UserInfoService userInfoService, IAuthenticationFacade authenticationFacade) {
         this.excelService = excelService;
         this.submitMsgService = submitMsgService;
         this.userService = userService;
+        this.userInfoService = userInfoService;
         this.authenticationFacade = authenticationFacade;
     }
 
@@ -53,10 +58,26 @@ public class SubmitMsgController {
     @ApiImplicitParam(name = "id", required = true, value = "模板id")
     @RequestMapping(value = "/user/excel/{id}", method = RequestMethod.GET)
     public ResultBody getExcelById(@PathVariable("id") String id) {
-        try{
+        try {
             Excel excel = excelService.getById(id);
             return ResultBody.success(excel.getHeadContent());
-        }catch(Exception e){
+        } catch (Exception e) {
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+    /** 获取用户附加的个人信息，用于自动填表
+     * @return 当前用户的个人信息
+     */
+    @ApiOperation("获取用户附加的个人信息，自动填表")
+    @RequestMapping(value = "/user/personalInfo", method = RequestMethod.GET)
+    public ResultBody getPersonalInfo(){
+        Authentication authentication = authenticationFacade.getAuthentication();
+        User currentUser = userService.findUserByUsername(authentication.getName());
+        try {
+            UserInfo userInfo = userInfoService.getUserInfoByUserId(currentUser.getUuid());
+            return ResultBody.success(userInfo);
+        }catch (BusinessException e){
             return ResultBody.error(e.getMessage());
         }
     }
@@ -76,15 +97,39 @@ public class SubmitMsgController {
         User currentUser = userService.findUserByUsername(authentication.getName());
         try {
             JSONObject jsonObject = JSONObject.parseObject(submitMsg);
+            String excelId = jsonObject.getString("excelId");
+            //重复提交查询
+            if (submitMsgService.checkIsSubmitted(currentUser.getUuid(), excelId)) {
+                return ResultBody.error("您已提交过此表单，请不要重复提交！");
+            }
+            //存储提交内容
             SubmitMsg stuMsg = submitMsgService.submitMsg(currentUser.getUuid(), jsonObject);
             return ResultBody.success(stuMsg);
-        }catch (BusinessException e){
+        } catch (BusinessException e) {
             return ResultBody.error(e.getMessage());
-
         }
     }
 
-    /**查看填表历史————获取某用户提交过的所有信息
+
+    /**
+     * 删除一条提交过的信息
+     * @param msgId 要删除的msgId
+     * @return
+     */
+    @ApiOperation("删除用户提交过的SubmitMsg")
+    @RequestMapping(value = "/user/deleteSubmitMsg", method = RequestMethod.POST)
+    public ResultBody deleteSubmitMsg(@RequestParam("submitMsgId")String msgId) {
+        try {
+            SubmitMsg submitMsg = submitMsgService.removeById(msgId);
+            return ResultBody.success(submitMsg);
+        } catch (Exception e) {
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+
+    /**
+     * 查看填表历史————获取某用户提交过的所有信息
      */
     @ApiOperation("获取用户提交过的SubmitMsg")
     @RequestMapping(value = "/user/getMySubmit", method = RequestMethod.GET)
@@ -102,6 +147,7 @@ public class SubmitMsgController {
                 myHistoryVo.setFileName(excel.getFileName());
                 myHistoryVo.setTitle(excel.getTitle());
                 myHistoryVo.setHead(excel.getHeadContent());
+                myHistoryVo.setUuid(submitMsg.getUuid());
                 myHistoryVo.setContent(submitMsg.getContent());
                 temp = submitMsg.getUpdateTime().toString();
                 myHistoryVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
@@ -112,4 +158,6 @@ public class SubmitMsgController {
             return ResultBody.error(e.getMessage());
         }
     }
+
+
 }

@@ -297,4 +297,13 @@ public class UserServiceImpl extends AbstractCurdService<User, String> implement
             throw new BusinessException("存储新用户时出错");
         }
     }
+
+    @Override
+    public User findUserById(String id) {
+        try{
+            return userRepository.findByUuid(id);
+        }catch (Exception e){
+            throw new BusinessException("指定userid不存在");
+        }
+    }
 }
