@@ -256,7 +256,6 @@ public class UserServiceImpl extends AbstractCurdService<User, String> implement
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
         try {
             User user = findUserByUsername(username);
             if (user == null) {
@@ -269,9 +268,7 @@ public class UserServiceImpl extends AbstractCurdService<User, String> implement
             for (Role role : roles) {
                 authorities.add(new SimpleGrantedAuthority(role.getName()));
             }
-
             log.info("当前用户："+username+"，当前用户拥有的权限"+authorities.toString());
-
 
             UserDetails userDetails = new org.springframework.security.core.userdetails.User
                     (username, user.getPassword(), authorities);

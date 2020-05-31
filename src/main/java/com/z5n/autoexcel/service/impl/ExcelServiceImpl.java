@@ -73,7 +73,7 @@ public class ExcelServiceImpl extends AbstractCurdService<Excel, String> impleme
         }
 
         Map<Integer, String> map;
-        switch (headList.size()) {
+        switch (headList.size()) {      //根据表格行数，判定表头位置
             case 1:
                 map = headList.get(0);
                 break;

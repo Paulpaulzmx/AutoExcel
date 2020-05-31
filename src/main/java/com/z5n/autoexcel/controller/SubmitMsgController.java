@@ -146,7 +146,14 @@ public class SubmitMsgController {
                 MyHistoryVo myHistoryVo = new MyHistoryVo();
                 myHistoryVo.setFileName(excel.getFileName());
                 myHistoryVo.setTitle(excel.getTitle());
-                myHistoryVo.setHead(excel.getHeadContent());
+                //美化表头字段
+                StringBuffer headStringBuffer = new StringBuffer(excel.getHeadContent());
+                String[] heads = headStringBuffer.substring(1, headStringBuffer.length() - 1).split(",");
+                StringBuffer headContent = new StringBuffer();
+                for (String s : heads) {
+                    headContent.append("「"+s.substring(s.lastIndexOf(':') + 2, s.length() - 1)+"」");
+                }
+                myHistoryVo.setHead(headContent.toString());
                 myHistoryVo.setUuid(submitMsg.getUuid());
                 myHistoryVo.setContent(submitMsg.getContent());
                 temp = submitMsg.getUpdateTime().toString();

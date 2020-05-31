@@ -112,7 +112,14 @@ public class ExcelController {
                 excelVo.setSubmitNum(count);
                 excelVo.setUuid(excel.getUuid());
                 excelVo.setFileName(excel.getFileName());
-                excelVo.setHeadContent(excel.getHeadContent());
+                //美化表头字段
+                StringBuffer headStringBuffer = new StringBuffer(excel.getHeadContent());
+                String[] heads = headStringBuffer.substring(1, headStringBuffer.length() - 1).split(",");
+                StringBuffer headContent = new StringBuffer();
+                for (String s : heads) {
+                    headContent.append("「"+s.substring(s.lastIndexOf(':') + 2, s.length() - 1)+"」");
+                }
+                excelVo.setHeadContent(headContent.toString());
                 temp = excel.getCreateTime().toString();
                 excelVo.setCreateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
                 temp = excel.getUpdateTime().toString();

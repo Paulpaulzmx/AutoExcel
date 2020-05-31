@@ -227,6 +227,49 @@
     })
 </script>
 
+<script>
+    //字段校验
+    $(function () {
+        //检测邮箱格式
+        $("#emailAddress").blur(function () {
+            var search_str = /^[\w\-\.]+@[\w\-\.]+(\.\w+)+$/;
+            var email_val = $("#emailAddress").val();
+            if (!search_str.test(email_val) && email_val != "") {
+                alert("邮箱格式错误");
+            }
+        });
+
+        //检测密码一致
+        $("#passwordVerify").blur(function () {
+            if (!$("#password").val() || $("#passwordVerify").val() != $("#password").val()) {
+                alert("两次密码不一致!");
+            }
+        });
+
+        //检测手机号格式
+        $("#tel").blur(function () {
+            var reg = /^1[34578]\d{9}$/;
+            if (!reg.test($("#tel").val()) && $("#tel").val() != "") {
+                alert("请输入正确的手机号！")
+            }
+        });
+        $("#stuNum").blur(function () {
+            var reg = /^\d{10}$/;
+            if (!reg.test($("#stuNum").val()) && $("#stuNum").val() != "") {
+                alert("请输入正确的学号！")
+            }
+        });
+        $("#idCardNum").blur(function () {
+            var reg = /^\d{18}$/;
+            if (!reg.test($("#idCardNum").val()) && $("#idCardNum").val() != "") {
+                alert("请输入正确的身份证号！")
+            }
+        });
+
+    });
+
+</script>
+
 </body>
 </html>
 
