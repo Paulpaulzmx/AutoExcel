@@ -15,6 +15,7 @@ import com.z5n.autoexcel.service.UserService;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.system.ApplicationHome;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,6 +45,8 @@ public class ExcelController {
     private final IAuthenticationFacade authenticationFacade;
 
     private final String excelDir = ResourceUtils.getURL("classpath:").getPath() + "../../Excels/";
+
+//    private final String excelDir = getJarRoot() + "/Excels/";        //jar包所在目录
 
 
     public ExcelController(ExcelService excelService,
@@ -189,6 +192,7 @@ public class ExcelController {
             String title = currentExcel.getTitle();
             String headContent = currentExcel.getHeadContent();
             //新建文件
+            log.info("当前生成的目录为："+excelDir);
             File file = new File(excelDir + currentExcel.getFileName() + ".xls");
             file.createNewFile();
             //开始写入
@@ -249,5 +253,12 @@ public class ExcelController {
             list.add(data);
         }
         return list;
+    }
+
+    //获取jar包所在路径
+    public String getJarRoot(){
+        ApplicationHome home = new ApplicationHome(getClass());
+        File jarFile = home.getSource();
+        return jarFile.getParentFile().getPath();
     }
 }

@@ -57,14 +57,17 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
 
     }
 
-    /**为限制每个用户在每个表只能提交一次数据，查询是否已提交过
-     * @param userId    用户id
-     * @param excelId   表格id
-     */
-    public boolean checkIsSubmitted(String userId, String excelId){
-        List<SubmitMsg> submittedUsers = submitMsgRepository
-                .findByFillerIdAndExcelIdAndDeleted(userId, excelId, false);
-        return (submittedUsers.size() != 0);
+    @Override
+    public SubmitMsg updateSubmitMsg(String submitMsgId, JSONObject jsonObject) {
+        try {
+            jsonObject.remove("excelId");
+            SubmitMsg submitMsg = submitMsgRepository.findByUuid(submitMsgId);
+            submitMsg.setContent(jsonObject.toJSONString());
+            this.update(submitMsg);
+            return submitMsg;
+        }catch(Exception e){
+            throw new BusinessException(e.getMessage());
+        }
     }
 
     /**
@@ -125,4 +128,15 @@ public class SubmitMsgServiceImpl extends AbstractCurdService<SubmitMsg, String>
             throw new BusinessException("删除出错");
         }
     }
+
+    /**为限制每个用户在每个表只能提交一次数据，查询是否已提交过
+     * @param userId    用户id
+     * @param excelId   表格id
+     */
+    public boolean checkIsSubmitted(String userId, String excelId){
+        List<SubmitMsg> submittedUsers = submitMsgRepository
+                .findByFillerIdAndExcelIdAndDeleted(userId, excelId, false);
+        return (submittedUsers.size() != 0);
+    }
+
 }

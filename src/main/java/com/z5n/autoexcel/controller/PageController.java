@@ -105,5 +105,10 @@ public class PageController {
         return "user/editPersonInfo";
     }
 
+    @ApiOperation("修改历史提交")
+    @RequestMapping(value = "/user/editHistory/{id}", method = RequestMethod.GET)
+    public String editHistory(){
+        return "user/editHistory";
+    }
 
 }

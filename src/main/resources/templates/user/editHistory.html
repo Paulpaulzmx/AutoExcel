@@ -82,7 +82,7 @@
                     <br/>
                     <div id="FormBegin">
                         <div class="form-group">
-                            <input type="hidden" id="hiddenId" name="excelId" value="">
+                            <input type="hidden" id="hiddenId" name="submitMsgId" value="">
                         </div>
                     </div>
                     <input type="button" onclick="submitMsg()" class="btn btn-lg btn-success"
@@ -117,19 +117,20 @@
         var submitData = $("#form").serializeArray();
         var submitDataParam = {};
 
-        for(var i =0;i<submitData.length;i++)
-        {
+        for (var i = 0; i < submitData.length; i++) {
             submitDataParam[submitData[i].name] = submitData[i]['value'];
         }
         $.ajax({
             type: "POST",
             dataType: "json",
-            url: "/submit",
-            contentType:"application/json;charset=UTF-8",
+            url: "/updateSubmit",
+            contentType: "application/json;charset=UTF-8",
             data: JSON.stringify(submitDataParam),
             success: function (result) {
+                console.log(result);//打印服务端返回的数据(调试用)
                 if (result.code == 200) {
                     alert("提交成功");
+                    window.location.href = "/user/history";
                 } else {
                     alert(result.message);
                 }
@@ -142,13 +143,27 @@
     }
 </script>
 <script>
-    // 获取url中的excelId
+    var url = window.location.href;
+    var submitMsgId = url.substring(url.lastIndexOf("/") + 1);
+    $("#hiddenId").val(submitMsgId);
+
+    // 根据url中的submitMsgId获取ExcelId
     function getExcelId() {
-        var url = window.location.href;
-        var excelId = url.substring(url.lastIndexOf("/") + 1);
-        if (!(typeof excelId == "undefined" || excelId == null || excelId == "")) {
-            $("#hiddenId").val(excelId);
-            return (excelId);
+        if (!(typeof submitMsgId == "undefined" || submitMsgId == null || submitMsgId == "")) {
+            var excelId;
+            $.ajax({
+                url: "/user/getExcelIdBySubmitMsgId/" + submitMsgId,
+                async: false,
+                success(result) {
+                    if (result.code == 200) {
+                        var result = result.result;
+                        excelId = result.uuid;
+                    } else if(result.code == -1){
+                        alert(result.message);
+                    }
+                }
+            });
+            return excelId;
         }
     }
 
@@ -187,41 +202,18 @@
                                     "        <label>" + json[item] + "</label>\n" +
                                     "        <input type=\"text\" name=" + item + " id=" + json[item] +
                                     " placeholder=\"" + json[item] + "\">\n" +
-                                    "    </div>\n")
+                                    "    </div>\n");
                         }
-                        //自动填充用户附加数据
+                        //自动填充用户历史提交数据
                         $.ajax({
-                            url: "/user/personalInfo/",
+                            url: "/user/getSubmitMsgById/" + submitMsgId,
                             success(result) {
                                 if (result.code == "200") {
-                                    // 请求模板成功，生成前端表单页面
-                                    var result = result.result;
-                                    if (result != null) {
-                                        $("#地址").val(result.address);
-                                        $("#家庭住址").val(result.address);
-                                        $("#住址").val(result.address);
-                                        $("#现住址").val(result.address);
-                                        $("#现居住地").val(result.address);
-                                        $("#所在地").val(result.address);
-                                        if(result.gender){
-                                            $("#性别").val("男");
-                                        }else{
-                                            $("#性别").val("女");
-                                        }
-                                        $("#姓名").val(result.name);
-                                        $("#电话").val(result.tel);
-                                        $("#手机号").val(result.tel);
-                                        $("#手机号码").val(result.tel);
-                                        $("#电话号码").val(result.tel);
-                                        $("#联系电话").val(result.tel);
-                                        $("#联系方式").val(result.tel);
-                                        $("#班级").val(result.classNum);
-                                        $("#qq").val(result.qq);
-                                        $("#QQ").val(result.qq);
-                                        $("#身份证号码").val(result.idNum);
-                                        $("#身份证号").val(result.idNum);
-                                        $("#身份证").val(result.idNum);
-                                        $("#学号").val(result.stuNum);
+                                    var jsonObj = JSON.parse(result.result.content);
+                                    i=1;
+                                    for (var item in jsonObj) {
+                                        $("#FormBegin").children().eq(i).children().eq(1).val(jsonObj[i-1]);
+                                        i++;
                                     }
                                 } else {
                                     alert(result.message);

@@ -17,6 +17,8 @@ import java.util.List;
 public interface SubmitMsgService extends CurdService<SubmitMsg, String> {
     public SubmitMsg submitMsg(String fillerId, JSONObject jsonObject);
 
+    public SubmitMsg updateSubmitMsg(String submitMsgId, JSONObject jsonObject);
+
     public List<SubmitMsg> getValidSubmitMsgByExcelIdSortByUpdateTimeDesc(String excelId);
 
     public List<SubmitMsg> getValidSubmitMsgByFillerIdSortByUpdateTimeDesc(String userID);
@@ -26,4 +28,5 @@ public interface SubmitMsgService extends CurdService<SubmitMsg, String> {
     public int countMsgByExcelId(String excelId);
 
     public boolean checkIsSubmitted(String userId, String excelId);
+
 }

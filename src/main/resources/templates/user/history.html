@@ -99,6 +99,9 @@
 <script>
     function operateFormatter(value, row, index) {
         return [
+            '<a class="edit" href="javascript:void(0)" title="编辑">',
+            '<i class="fa fa-edit"/>',
+            '</a>  ',
             '<a class="remove" href="javascript:void(0)" title="删除">',
             '<i class="fa fa-trash"/>',
             '</a>',
@@ -106,6 +109,9 @@
     }
 
     window.operateEvents = {
+        'click .edit': function (e, value, row, index) {
+            window.location.href = "/user/editHistory/" + row.uuid;
+        },
         'click .remove': function (e, value, row, index) {
             //发出删除操作api
             if (confirm("确认删除？")) {

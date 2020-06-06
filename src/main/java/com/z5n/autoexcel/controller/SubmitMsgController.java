@@ -111,6 +111,32 @@ public class SubmitMsgController {
     }
 
 
+
+    /**
+     * (填表人)更新一条提交过的信息
+     *
+     * @param submitMsg json形式的信息
+     * @return 是否成功
+     */
+    @ApiOperation("填表人修改提交过的信息的接口")
+    @ApiImplicitParam(name = "submitMsg", required = true, value = "json字符串形式，包括模板id和表格具体内容")
+    @RequestMapping(value = "/updateSubmit", method = RequestMethod.POST)
+    public ResultBody updateSubmit(@RequestBody String submitMsg) {
+        Authentication authentication = authenticationFacade.getAuthentication();
+        User currentUser = userService.findUserByUsername(authentication.getName());
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(submitMsg);
+            String submitMsgId = jsonObject.getString("submitMsgId");
+            jsonObject.remove("submitMsgId");
+            //存储提交内容
+            SubmitMsg stuMsg = submitMsgService.updateSubmitMsg(submitMsgId, jsonObject);
+            return ResultBody.success(stuMsg);
+        } catch (BusinessException e) {
+            return ResultBody.error(e.getMessage());
+        }
+    }
+
+
     /**
      * 删除一条提交过的信息
      * @param msgId 要删除的msgId
@@ -166,5 +192,19 @@ public class SubmitMsgController {
         }
     }
 
+    @ApiOperation("根据当前SubmitMsg的id获取其所属的Excel")
+    @RequestMapping(value = "/user/getExcelIdBySubmitMsgId/{id}", method = RequestMethod.GET)
+    public ResultBody getExcelIdBySubmitMsgId(@PathVariable("id") String msgId){
+        SubmitMsg submitted = submitMsgService.getById(msgId);
+        Excel excel = excelService.getById(submitted.getExcelId());
+        return ResultBody.success(excel);
+    }
+
+    @ApiOperation("根据id获取一条SubmitMsg")
+    @RequestMapping(value = "/user/getSubmitMsgById/{submitMsgId}", method = RequestMethod.GET)
+    public ResultBody getSubmitMsgById(@PathVariable("submitMsgId") String msgId){
+        SubmitMsg submitted = submitMsgService.getById(msgId);
+        return ResultBody.success(submitted);
+    }
 
 }
