@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Data
 @ToString
-public class ResetPasswordVO {
+public class ResetPasswordVo {
     private String username;
     private String verifyCode;
     private String newPassword;

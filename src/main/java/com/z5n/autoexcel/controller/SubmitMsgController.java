@@ -13,6 +13,7 @@ import com.z5n.autoexcel.service.ExcelService;
 import com.z5n.autoexcel.service.SubmitMsgService;
 import com.z5n.autoexcel.service.UserInfoService;
 import com.z5n.autoexcel.service.UserService;
+import com.z5n.autoexcel.utils.TableHeadsUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -122,8 +123,6 @@ public class SubmitMsgController {
     @ApiImplicitParam(name = "submitMsg", required = true, value = "json字符串形式，包括模板id和表格具体内容")
     @RequestMapping(value = "/updateSubmit", method = RequestMethod.POST)
     public ResultBody updateSubmit(@RequestBody String submitMsg) {
-        Authentication authentication = authenticationFacade.getAuthentication();
-        User currentUser = userService.findUserByUsername(authentication.getName());
         try {
             JSONObject jsonObject = JSONObject.parseObject(submitMsg);
             String submitMsgId = jsonObject.getString("submitMsgId");
@@ -166,24 +165,8 @@ public class SubmitMsgController {
             List<SubmitMsg> submitMsgs =
                     submitMsgService.getValidSubmitMsgByFillerIdSortByUpdateTimeDesc(currentUser.getUuid());
             List<MyHistoryVo> historyVos = new ArrayList<>();
-            String temp;
             for (SubmitMsg submitMsg : submitMsgs) {
-                Excel excel = excelService.getById(submitMsg.getExcelId());
-                MyHistoryVo myHistoryVo = new MyHistoryVo();
-                myHistoryVo.setFileName(excel.getFileName());
-                myHistoryVo.setTitle(excel.getTitle());
-                //美化表头字段
-                StringBuffer headStringBuffer = new StringBuffer(excel.getHeadContent());
-                String[] heads = headStringBuffer.substring(1, headStringBuffer.length() - 1).split(",");
-                StringBuffer headContent = new StringBuffer();
-                for (String s : heads) {
-                    headContent.append("「"+s.substring(s.lastIndexOf(':') + 2, s.length() - 1)+"」");
-                }
-                myHistoryVo.setHead(headContent.toString());
-                myHistoryVo.setUuid(submitMsg.getUuid());
-                myHistoryVo.setContent(submitMsg.getContent());
-                temp = submitMsg.getUpdateTime().toString();
-                myHistoryVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                MyHistoryVo myHistoryVo = generateMyHistoryVo(submitMsg);
                 historyVos.add(myHistoryVo);
             }
             return ResultBody.success(historyVos);
@@ -191,6 +174,27 @@ public class SubmitMsgController {
             return ResultBody.error(e.getMessage());
         }
     }
+
+    /**生成历史Vo
+     * @param submitMsg
+     * @return
+     */
+    private MyHistoryVo generateMyHistoryVo(SubmitMsg submitMsg) {
+        MyHistoryVo myHistoryVo = new MyHistoryVo();
+
+        String stringifyTime = submitMsg.getUpdateTime().toString();
+        Excel excel = excelService.getById(submitMsg.getExcelId());
+
+        myHistoryVo.setFileName(excel.getFileName());
+        myHistoryVo.setTitle(excel.getTitle());
+        myHistoryVo.setHead(TableHeadsUtils.beautifyHeads(excel.getHeadContent()).toString());
+        myHistoryVo.setUuid(submitMsg.getUuid());
+        myHistoryVo.setContent(submitMsg.getContent());
+        myHistoryVo.setUpdateTimeStr(stringifyTime.substring(0, stringifyTime.lastIndexOf(".")));
+
+        return myHistoryVo;
+    }
+
 
     @ApiOperation("根据当前SubmitMsg的id获取其所属的Excel")
     @RequestMapping(value = "/user/getExcelIdBySubmitMsgId/{id}", method = RequestMethod.GET)

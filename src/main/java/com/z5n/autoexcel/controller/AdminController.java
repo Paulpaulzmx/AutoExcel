@@ -56,22 +56,34 @@ public class AdminController {
             int count;
             String temp;
             for (Excel excel : excelList) {
-                ExcelVo excelVo = new ExcelVo();
-                count = submitMsgService.countMsgByExcelId(excel.getUuid());
-                excelVo.setSubmitNum(count);
-                excelVo.setUuid(excel.getUuid());
-                excelVo.setFileName(excel.getFileName());
-                excelVo.setHeadContent(excel.getHeadContent());
-                temp = excel.getCreateTime().toString();
-                excelVo.setCreateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
-                temp = excel.getUpdateTime().toString();
-                excelVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                ExcelVo excelVo = generateExcelVo(excel);
                 excelVoList.add(excelVo);
             }
             return ResultBody.success(excelVoList);
         } catch (BusinessException e){
             return ResultBody.error(e.getMessage());
         }
+    }
+
+    /**生成ExcelVo
+     * @param excel
+     * @return
+     */
+    private ExcelVo generateExcelVo(Excel excel) {
+
+        String stringifyTime;
+        ExcelVo excelVo = new ExcelVo();
+
+        excelVo.setSubmitNum(submitMsgService.countMsgByExcelId(excel.getUuid()));
+        excelVo.setUuid(excel.getUuid());
+        excelVo.setFileName(excel.getFileName());
+        excelVo.setHeadContent(excel.getHeadContent());
+        stringifyTime = excel.getCreateTime().toString();
+        excelVo.setCreateTimeStr(stringifyTime.substring(0, stringifyTime.lastIndexOf(".")));
+        stringifyTime = excel.getUpdateTime().toString();
+        excelVo.setUpdateTimeStr(stringifyTime.substring(0, stringifyTime.lastIndexOf(".")));
+
+        return excelVo;
     }
 
     /**管理员查看提交历史页面，查看全部提交过的信息
@@ -85,22 +97,34 @@ public class AdminController {
             List<MyHistoryVo> historyVos = new ArrayList<>();
             String temp;
             for (SubmitMsg submitMsg : submitMsgs) {
-                Excel excel = excelService.getById(submitMsg.getExcelId());
-                User user = userService.findUserById(submitMsg.getFillerId());
-                MyHistoryVo myHistoryVo = new MyHistoryVo();
-                myHistoryVo.setFileName(excel.getFileName());
-                myHistoryVo.setTitle(excel.getTitle());
-                myHistoryVo.setHead(excel.getHeadContent());
-                myHistoryVo.setUuid(submitMsg.getUuid());
-                myHistoryVo.setFillerName(user.getName());
-                myHistoryVo.setContent(submitMsg.getContent());
-                temp = submitMsg.getUpdateTime().toString();
-                myHistoryVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                MyHistoryVo myHistoryVo = generateMyHistoryVo(submitMsg);
                 historyVos.add(myHistoryVo);
             }
             return ResultBody.success(historyVos);
         }catch (BusinessException e){
             return ResultBody.error(e.getMessage());
         }
+    }
+
+    /**根据提交信息生成历史Vo
+     * @param submitMsg
+     * @return
+     */
+    private MyHistoryVo generateMyHistoryVo(SubmitMsg submitMsg) {
+        MyHistoryVo myHistoryVo = new MyHistoryVo();
+
+        String stringifyTime = submitMsg.getUpdateTime().toString();
+        Excel excel = excelService.getById(submitMsg.getExcelId());
+        User user = userService.findUserById(submitMsg.getFillerId());
+
+        myHistoryVo.setFileName(excel.getFileName());
+        myHistoryVo.setTitle(excel.getTitle());
+        myHistoryVo.setHead(excel.getHeadContent());
+        myHistoryVo.setUuid(submitMsg.getUuid());
+        myHistoryVo.setFillerName(user.getName());
+        myHistoryVo.setContent(submitMsg.getContent());
+        myHistoryVo.setUpdateTimeStr(stringifyTime.substring(0, stringifyTime.lastIndexOf(".")));
+
+        return myHistoryVo;
     }
 }

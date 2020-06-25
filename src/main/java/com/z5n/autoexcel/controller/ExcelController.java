@@ -12,6 +12,7 @@ import com.z5n.autoexcel.model.vo.ExcelVo;
 import com.z5n.autoexcel.service.ExcelService;
 import com.z5n.autoexcel.service.SubmitMsgService;
 import com.z5n.autoexcel.service.UserService;
+import com.z5n.autoexcel.utils.TableHeadsUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -81,17 +82,24 @@ public class ExcelController {
 
         try {
             Excel excel = excelService.readExcelHeadExcel(file, uploader.getUuid());
-            result.put("error", null);
-            result.put("status", "OK");
-            result.put("excelId", excel.getUuid());
-
+            generateSuccessResult(result, excel);
             return result.toJSONString();
         } catch (Exception e) {
-            result.put("status", "error");
-            result.put("error", e.getMessage());
+            generateErrorResult(result, e);
             return result.toJSONString();
         }
 
+    }
+
+    private void generateErrorResult(JSONObject result, Exception e) {
+        result.put("status", "error");
+        result.put("error", e.getMessage());
+    }
+
+    private void generateSuccessResult(JSONObject result, Excel excel) {
+        result.put("error", null);
+        result.put("status", "OK");
+        result.put("excelId", excel.getUuid());
     }
 
     /**
@@ -107,26 +115,8 @@ public class ExcelController {
         try {
             List<Excel> excelList = excelService.getExcelListByUploaderIdSortByCreateTimeDesc(uploader.getUuid());
             List<ExcelVo> excelVoList = new ArrayList<>();
-            int count;
-            String temp;
             for (Excel excel : excelList) {
-                ExcelVo excelVo = new ExcelVo();
-                count = submitMsgService.countMsgByExcelId(excel.getUuid());
-                excelVo.setSubmitNum(count);
-                excelVo.setUuid(excel.getUuid());
-                excelVo.setFileName(excel.getFileName());
-                //美化表头字段
-                StringBuffer headStringBuffer = new StringBuffer(excel.getHeadContent());
-                String[] heads = headStringBuffer.substring(1, headStringBuffer.length() - 1).split(",");
-                StringBuffer headContent = new StringBuffer();
-                for (String s : heads) {
-                    headContent.append("「"+s.substring(s.lastIndexOf(':') + 2, s.length() - 1)+"」");
-                }
-                excelVo.setHeadContent(headContent.toString());
-                temp = excel.getCreateTime().toString();
-                excelVo.setCreateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
-                temp = excel.getUpdateTime().toString();
-                excelVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+                ExcelVo excelVo = generateExcelVo(excel);
                 excelVoList.add(excelVo);
             }
             return ResultBody.success(excelVoList);
@@ -136,6 +126,23 @@ public class ExcelController {
             log.error(e.getMessage());
             return ResultBody.error("出现逻辑错误，请查看日志");
         }
+    }
+
+    private ExcelVo generateExcelVo(Excel excel) {
+        ExcelVo excelVo = new ExcelVo();
+
+        int count = submitMsgService.countMsgByExcelId(excel.getUuid());
+        String temp;
+
+        excelVo.setSubmitNum(count);
+        excelVo.setUuid(excel.getUuid());
+        excelVo.setFileName(excel.getFileName());
+        excelVo.setHeadContent(TableHeadsUtils.beautifyHeads(excel.getHeadContent()).toString());
+        temp = excel.getCreateTime().toString();
+        excelVo.setCreateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+        temp = excel.getUpdateTime().toString();
+        excelVo.setUpdateTimeStr(temp.substring(0, temp.lastIndexOf(".")));
+        return excelVo;
     }
 
     /**
