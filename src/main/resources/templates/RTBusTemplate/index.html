@@ -1,0 +1,373 @@
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/rtbus/css/index.css" rel="stylesheet">
+
+    <title>湘潭交通</title>
+
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            /*padding-top: 70px;*/
+        }
+
+        .content {
+            flex: 1;
+        }
+    </style>
+
+</head>
+<body class="vsc-initialized">
+<div class="nav" role="navigation">
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">实时公交</a>
+            </div>
+        </div>
+    </nav>
+</div>
+<!-- 中间的主体部分 -->
+<div class="content" id="main-content">
+    <!--    这里写页面内容   -->
+
+    <!-- 左侧显示车辆实时位置 -->
+    <div class="bs-docs-sidebar col-md-3" id="main-left">
+
+        <label for="filter" class="filter">
+            快速筛选线路：
+            <input id="filter" class="form-control" type="text">
+        </label>
+        <!-- 下面是列表，上面为筛选框 -->
+        <ul class="nav nav-stacked bs-docs-sidenav">
+            <li @click="detailLineSearch(line.label, line.start_station_name, line.stop_station_name)"
+                v-for="line in lines" class="line">
+                <a href="#main-right">
+                    {{ line.label }}:{{ line.start_station_name }}
+                    <span class="glyphicon glyphicon-arrow-right"></span>
+                    {{ line.stop_station_name }}
+                </a>
+
+
+
+            </li>
+        </ul>
+
+    </div>
+
+    <!-- 右侧显示所有车辆的列表 -->
+    <div class="col-md-9 hidden" id="main-right">
+
+        <div class="right-header">
+            <label for="bt"> 由：{{ titles.start_station }} &nbsp;&nbsp;&nbsp; 开往：{{ titles.stop_station}}
+            </label>
+            <button id="bt" class="btn" @click="reverse()">反向</button>
+        </div>
+
+        <div class="table-responsive ">
+            <table class="table table-striped" style="width: 100%;">
+                <tr>
+                    <th>站次</th>
+                    <th>站名</th>
+                    <th>状态</th>
+                </tr>
+                <tr v-for="(station, index) in stations" v-bind:key="index">
+                    <td>
+                        {{ index+1 }}
+                    </td>
+                    <td class="station">
+                        {{ station.label }}<br/>
+
+                    </td>
+                    <td v-for="(data,i) in buses_info.buses_index"
+                        v-if="index==data && !isComingList[i] && buses_info.buses_distances[i]>250"
+                        v-bind:class="{ success : isComingList[i]}"
+                        class="bus">
+                        途中, 距车站还有：{{ buses_info.buses_distances[i]}}米
+                    </td>
+                    <td v-else-if="index==data && !isComingList[i] && buses_info.buses_distances[i]<=250">
+                        即将到站
+                    </td>
+                    <td v-else-if="index+1==data && isComingList[i]" v-bind:class="{ success : isComingList[i]}">
+                        到站
+                    </td>
+                    <!--                    <td v-else>-->
+                    <!--                        -->
+                    <!--                    </td>-->
+
+                </tr>
+            </table>
+        </div>
+
+
+    </div>
+
+    <div class="dingbu2">
+        <button id="btn1" class="glyphicon glyphicon-chevron-up"></button>
+    </div>
+
+</div>
+
+<!-- 底部footer -->
+<div style="
+    min-width: 100%;
+    background-color: #f8f8f8;
+    padding: 15px;">
+    <footer class="text-center text-muted" style="margin-top: auto;margin-bottom: auto">实时公交</footer>
+</div>
+
+
+<!-- Bootstrap core JavaScript
+==================================================
+-- Placed at the end of the document so the pages load faster -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+<script>
+    //请求全部线路
+    const app = new Vue({
+        el: '#main-content',
+        data: {
+            lines: [],
+            stations: [],
+            buses: [],
+            buses_info: {
+                buses_index: [],
+                buses_distances: [],
+            },
+            isComingList: [],
+            id: 0,
+            timer: 0,
+            text: '',
+            direction: 1,
+            titles: {
+                start_station: '',
+                stop_station: '',
+            }
+        },
+
+        created() {
+            // 进入时获取所有线路信息
+            fetch('http://xiangtan.busll.cn:9920/rest/xt/app/busLine/getAllLinesWithNameAndStartEnd ',
+            // fetch('http://127.0.0.1:80/getAllLine ',
+                {
+                    method: 'GET',
+                    // mode:'no-cors',
+                    // headers: myHeaders,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    this.lines = data;
+                    // console.log(this.lines);
+                })
+            ;
+        },
+        methods: {
+            // 1、请求此线路的详细信息，主要有车站列表，路线id。点击触发
+            detailLineSearch: function (text, start, stop) {
+
+                //取消右侧列表的隐藏
+                $("#main-right").removeClass("hidden");
+
+                //定位到右侧列表（针对手机端优化）
+                // $('html.body').animate({scrollTop:$("#main-right").offset().top}, 800);
+                $('#main-right').scrollTop(100);
+
+                //重置direction
+                this.direction = 1;
+
+                //获取起始站终点站
+                this.titles.start_station = start;
+                this.titles.stop_station = stop;
+
+                //存入当前线路名
+                this.text = text;
+
+                //清空上一车次实时信息
+                this.buses = [];
+
+
+                let dataDetails = {
+                    direction: 1,
+                    label: text,
+                };
+                this.getBusPosition(dataDetails);
+            },
+            // 2、请求某一条线路的实时信息
+            busPositionSearch: function () {
+
+                // 点击后id不为0，开始自动刷新
+                if (this.id) {
+                    console.log(this.id);
+                    let myHeaders = new Headers({
+                        'Content-Type': 'application/json',
+                        'charset': 'utf-8',
+                    });
+                    let dataBusPositions = {
+                        busLineId: this.id,
+                    };
+                    // let reqBusPositions = new Request('http://127.0.0.1:80/getBusPositionWithDepartTimeByLine', {
+                    let reqBusPositions = new Request('http://xiangtan.busll.cn:9920/rest/xt/app/busLine/getBusPositionWithDepartTimeByLine', {
+                        method: 'POST',
+                        body: JSON.stringify(dataBusPositions),
+                        headers: myHeaders
+                    });
+                    //请求车辆位置
+                    fetch(reqBusPositions)
+                        .then(response => response.json())
+                        .then(data => {
+                            //得到的数据存入data
+                            this.buses = data.list;
+                        })
+                        .then(() => {
+                            //离站距离、车辆位置列表置空，到站情况列表长度初始化，并设为false
+                            if (this.buses_info.buses_index || this.buses_info.buses_index || this.isComingList) {
+                                this.buses_info.buses_index = [];
+                                this.buses_info.buses_distances = [];
+                                this.isComingList = [];
+                                for (i in this.buses) {
+                                    this.isComingList.push(false);
+                                }
+                            }
+                            //离站距离、车辆位置存入data
+                            for (i in this.buses) {
+                                this.buses_info.buses_index.push(this.buses[i].station_index);
+                                this.buses_info.buses_distances.push(this.buses[i].distance);
+                            }
+
+                            for (i in this.buses_info.buses_distances) {
+                                if (this.buses_info.buses_distances[i] < 100) {
+                                    this.isComingList[i] = true;
+                                }
+                            }
+                            // console.log(this.buses);
+                        });
+                }
+            },
+            // 点击后反向
+            reverse: function () {
+                let temp = this.titles.start_station;
+                this.titles.start_station = this.titles.stop_station;
+                this.titles.stop_station = temp;
+                if (this.direction === 1) {
+                    this.direction = 2;
+                } else {
+                    this.direction = 1;
+                }
+                let dataDetails = {
+                    direction: this.direction,
+                    label: this.text,
+                };
+                this.getBusPosition(dataDetails);
+            },
+            //请求操作封装
+            getBusPosition: function (dataDetails) {
+
+                //准备请求头
+                let myHeaders = new Headers({
+                    'Content-Type': 'application/json',
+                    'charset': 'utf-8',
+                });
+                //准备请求信息
+                // let reqDetails = new Request('http://127.0.0.1:80/detailLineSearch', {
+                let reqDetails = new Request('http://xiangtan.busll.cn:9920/rest/xt/app/busLine/detailLineSearch', {
+                    method: 'POST',
+                    body: JSON.stringify(dataDetails),
+                    headers: myHeaders
+                });
+                fetch(reqDetails)
+                    .then(response => response.json())
+                    .then(data => {
+                        this.stations = data.stations;
+                        this.id = data.id;
+
+                        //2、请求某一条线路的实时信息
+                        this.busPositionSearch();
+                    });
+            },
+
+
+        },
+        mounted: function () {
+            if (this.timer) {
+                clearInterval(this.timer);
+            } else {
+                this.timer = setInterval(() => {
+                    this.busPositionSearch();
+                }, 1000 * 5)
+            }
+        },
+        destroyed: function () {
+            clearInterval(this.timer)
+        },
+    })
+</script>
+<script>
+    $(function () {
+        //筛选线路
+        $("#filter").change(function () {
+            let val = $(this).val();
+            if (!val) {
+                $("#main-left li").slideDown();
+                return;
+            }
+            let showLi = $("#main-left li:contains(" + val + ")");
+            $("#main-left li").not(showLi).slideUp();
+            showLi.slideDown();
+        }).keyup(function () {
+            $(this).change();
+        });
+    })
+
+
+</script>
+<script>
+
+    $(".dingbu2").mouseover(function(){
+        $("#btn1").css("background-color","#00A1D6");  //蓝色
+        $("#btn1").css("color","#F6F9FA");	//白色
+    });
+    $(".dingbu2").mouseout(function(){
+        $("#btn1").css("background-color","#F6F9FA");
+        $("#btn1").css("color","#00A1D6");
+    });
+</script>
+
+
+<script>
+    $(function () {
+        //绑定滚动条事件
+
+        $(window).bind("scroll", function () {
+            var sTop = $(window).scrollTop();
+            var sTop = parseInt(sTop);
+
+            if(sTop>=800){
+                $(".dingbu2").show();
+            }else{
+                $(".dingbu2").hide();
+            }
+
+        });
+        <!-- 单机返回顶部 -->
+        $(".dingbu2").click(function(){
+            $("body").animate({scrollTop:0},1000);
+        });
+    })
+
+</script>
+
+
+</body>
+</html>
