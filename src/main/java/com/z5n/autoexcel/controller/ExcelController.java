@@ -236,9 +236,8 @@ public class ExcelController {
     //设置头
     private List<List<String>> getExcelHead(String title, String headContent) {
         JSONObject jsonHeadContent = JSONObject.parseObject(headContent);
-        int size = jsonHeadContent.size();
         List<List<String>> list = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < jsonHeadContent.size(); i++) {
             List<String> head = new ArrayList<>();
             head.add(title);
             head.add(jsonHeadContent.getString(String.valueOf(i)));

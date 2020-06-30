@@ -10,6 +10,7 @@ import com.z5n.autoexcel.model.vo.MyHistoryVo;
 import com.z5n.autoexcel.service.ExcelService;
 import com.z5n.autoexcel.service.SubmitMsgService;
 import com.z5n.autoexcel.service.UserService;
+import com.z5n.autoexcel.utils.TableHeadsUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -53,11 +54,8 @@ public class AdminController {
         List<Excel> excelList = excelService.getExcelList();
         try {
             List<ExcelVo> excelVoList = new ArrayList<>();
-            int count;
-            String temp;
             for (Excel excel : excelList) {
-                ExcelVo excelVo = generateExcelVo(excel);
-                excelVoList.add(excelVo);
+                excelVoList.add(generateExcelVo(excel));
             }
             return ResultBody.success(excelVoList);
         } catch (BusinessException e){
@@ -77,7 +75,7 @@ public class AdminController {
         excelVo.setSubmitNum(submitMsgService.countMsgByExcelId(excel.getUuid()));
         excelVo.setUuid(excel.getUuid());
         excelVo.setFileName(excel.getFileName());
-        excelVo.setHeadContent(excel.getHeadContent());
+        excelVo.setHeadContent(TableHeadsUtils.beautifyHeads(excel.getHeadContent()).toString());
         stringifyTime = excel.getCreateTime().toString();
         excelVo.setCreateTimeStr(stringifyTime.substring(0, stringifyTime.lastIndexOf(".")));
         stringifyTime = excel.getUpdateTime().toString();
@@ -95,10 +93,8 @@ public class AdminController {
         try {
             List<SubmitMsg> submitMsgs = submitMsgService.getAllValidSubmitMsgSortByUpdatetimeDesc();
             List<MyHistoryVo> historyVos = new ArrayList<>();
-            String temp;
             for (SubmitMsg submitMsg : submitMsgs) {
-                MyHistoryVo myHistoryVo = generateMyHistoryVo(submitMsg);
-                historyVos.add(myHistoryVo);
+                historyVos.add(generateMyHistoryVo(submitMsg));
             }
             return ResultBody.success(historyVos);
         }catch (BusinessException e){
@@ -111,6 +107,7 @@ public class AdminController {
      * @return
      */
     private MyHistoryVo generateMyHistoryVo(SubmitMsg submitMsg) {
+
         MyHistoryVo myHistoryVo = new MyHistoryVo();
 
         String stringifyTime = submitMsg.getUpdateTime().toString();
@@ -119,7 +116,7 @@ public class AdminController {
 
         myHistoryVo.setFileName(excel.getFileName());
         myHistoryVo.setTitle(excel.getTitle());
-        myHistoryVo.setHead(excel.getHeadContent());
+        myHistoryVo.setHead(TableHeadsUtils.beautifyHeads(excel.getHeadContent()).toString());
         myHistoryVo.setUuid(submitMsg.getUuid());
         myHistoryVo.setFillerName(user.getName());
         myHistoryVo.setContent(submitMsg.getContent());

@@ -95,24 +95,28 @@ public class UserController {
         try {
             Authentication authentication = authenticationFacade.getAuthentication();
             User currentUser = userService.findUserByUsername(authentication.getName());
-            UserInfo userInfo = userInfoService.getUserInfoByUserId(currentUser.getUuid());
-            userInfo.setAddress(newUserInfo.getAddress());
-            userInfo.setClassNum(newUserInfo.getClassNum());
-            userInfo.setQq(newUserInfo.getQq());
-            userInfo.setTel(newUserInfo.getTel());
-            userInfo.setIdNum(newUserInfo.getIdCardNum());
-            userInfo.setStuNum(newUserInfo.getStuNum());
-            if (newUserInfo.getGender() != null && newUserInfo.getGender().equals("male")) {
-                userInfo.setGender(1);
-            } else {
-                userInfo.setGender(0);
-            }
-            userInfo.setName(newUserInfo.getTrueName());
-            userInfoService.update(userInfo);
+            userInfoService.update(updateUserInfo(newUserInfo, currentUser));
             return ResultBody.success();
         } catch (BusinessException e) {
             return ResultBody.error(e.getMessage());
         }
+    }
+
+    private UserInfo updateUserInfo(UpdateUserInfoVo newUserInfo, User currentUser) {
+        UserInfo userInfo = userInfoService.getUserInfoByUserId(currentUser.getUuid());
+        userInfo.setAddress(newUserInfo.getAddress());
+        userInfo.setClassNum(newUserInfo.getClassNum());
+        userInfo.setQq(newUserInfo.getQq());
+        userInfo.setTel(newUserInfo.getTel());
+        userInfo.setIdNum(newUserInfo.getIdCardNum());
+        userInfo.setStuNum(newUserInfo.getStuNum());
+        if (newUserInfo.getGender() != null && newUserInfo.getGender().equals("male")) {
+            userInfo.setGender(1);
+        } else {
+            userInfo.setGender(0);
+        }
+        userInfo.setName(newUserInfo.getTrueName());
+        return userInfo;
     }
 
     /**

@@ -166,8 +166,7 @@ public class SubmitMsgController {
                     submitMsgService.getValidSubmitMsgByFillerIdSortByUpdateTimeDesc(currentUser.getUuid());
             List<MyHistoryVo> historyVos = new ArrayList<>();
             for (SubmitMsg submitMsg : submitMsgs) {
-                MyHistoryVo myHistoryVo = generateMyHistoryVo(submitMsg);
-                historyVos.add(myHistoryVo);
+                historyVos.add(generateMyHistoryVo(submitMsg));
             }
             return ResultBody.success(historyVos);
         } catch (BusinessException e) {
