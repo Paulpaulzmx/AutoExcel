@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class RTBusController {
     @RequestMapping(value = "/bus", method = RequestMethod.GET)
     public String BusIndex(){
-        return "/RTBus/index";
+        return "RTBusTemplate/index";
     }
 
 }

@@ -50,18 +50,14 @@
         <!-- 下面是列表，上面为筛选框 -->
         <ul class="nav nav-stacked bs-docs-sidenav">
             <li @click="detailLineSearch(line.label, line.start_station_name, line.stop_station_name)"
-                v-for="line in lines" class="line">
+                v-for="line in lines" class="line">，
                 <a href="#main-right">
                     {{ line.label }}:{{ line.start_station_name }}
                     <span class="glyphicon glyphicon-arrow-right"></span>
                     {{ line.stop_station_name }}
                 </a>
-
-
-
             </li>
         </ul>
-
     </div>
 
     <!-- 右侧显示所有车辆的列表 -->
